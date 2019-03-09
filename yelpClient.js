@@ -12,7 +12,7 @@ module.exports = {
         }
 
         // return is available in cache and less than 5 hrs of cache time
-        if (cache[id] && (Math.abs(Date.now() - cache[id]) / 36e5) < 5) {
+        if (cache[id] && (Math.abs(Date.now() - cache[id].ts) / 36e5) < 5) {
             return cache[id];
         }
 
