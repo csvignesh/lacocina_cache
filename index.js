@@ -4,7 +4,7 @@ const express = require('express');
 const request = require('request');
 const app = express();
 
-app.set('port', (process.env.PORT || 80));
+app.set('port', (process.env.PORT || 8080));
 app.use(express.static(__dirname + '/public'));
 
 const options = {
@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-  request(options, callback)
+  // request(options, callback)
   res.send({
     apple: 3,
     orange: "2",
