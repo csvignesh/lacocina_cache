@@ -7,7 +7,11 @@ const yelpApiKey = 'LHmAorCggtmQbxWdPB-T-4tnh2VGSYkn4zWoMbBiJPFOeAsQqpDGWtbsdhNP
 
 module.exports = {
     getDataFor: async(id) => {
-        if (!id) { return }
+        if (!id) {
+            return {'err': 'id missing'}
+        }
+
+        // return is available in cache and less than 5 hrs of cache time
         if (cache[id] && (Math.abs(Date.now() - cache[id]) / 36e5) < 5) {
             return cache[id];
         }
