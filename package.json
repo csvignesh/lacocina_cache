@@ -1,0 +1,15 @@
+{
+  "name": "lacocina",
+  "version": "1.0.0",
+  "description": "rest cache",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Vignesh <vigneshcs.1988@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "request": "latest",
+    "express": "latest"
+  }
+}
