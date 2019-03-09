@@ -4,7 +4,7 @@ const express = require('express');
 const request = require('request');
 const app = express();
 
-app.set('port', (process.env.PORT || 8080));
+app.set('port', (process.env.PORT || 80));
 app.use(express.static(__dirname + '/public'));
 
 const options = {
