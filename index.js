@@ -22,7 +22,13 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/all', async (req, res) => {
-    const data = await (gSheetClient.getSheetData());
+    const ids = await (gSheetClient.getSheetData());
+    const data = await Promise.all(ids.map(id => {
+        return new Promise(async (resolve) => {
+            const details = await (yelpClient.getDataFor(id));
+            resolve(details)
+        });
+    }));
     res.send(data);
 });
 
