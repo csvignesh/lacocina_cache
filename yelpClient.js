@@ -21,7 +21,7 @@ module.exports = {
         let callSuccess = false;
         do {
             if (retry > 0) {
-                console.log(`retrying ${id}`);
+                console.log(`Triggering retry for ${id}`);
                 await appUtils.sleep(1000);
             }
             const options = {
@@ -34,14 +34,17 @@ module.exports = {
             options.url = options.url.replace('{id}', id);
 
             const data = await (util.promisify(request.get)(options));
-            cache[id] = JSON.parse(data.body);
-            if (cache[id].error && cache[id].error.code === "TOO_MANY_REQUESTS_PER_SECOND") {
+            const responseData = JSON.parse(data.body);
 
+            if (responseData.error && responseData.error.code === "TOO_MANY_REQUESTS_PER_SECOND") {
+                console.log(`YELP ERROR for ${id} : ${responseData.error.code}`);
             } else {
                 callSuccess = true;
+                cache[id] = responseData;
+                cache[id].ts = Date.now();
             }
-            cache[id].ts = Date.now();
-            return cache[id];
-        } while (!callSuccess && ++retry < 3)
+        } while (!callSuccess && ++retry < 3);
+
+        return cache[id];
     }
 };
