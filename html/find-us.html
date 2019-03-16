@@ -1,0 +1,104 @@
+<style>
+    #map {
+        height: calc(100% - 50px);
+        width: 100%
+    }
+
+    .map-container {
+        margin: 0;
+        height: 500px;
+        position: relative;
+    }
+
+    .draggable-pane {
+        background-color: white;
+        width: 100%;
+        height: 50px;
+        position: absolute;
+        bottom: 0;
+    }
+    .sqs-block.code-block.sqs-block-code {
+        width: 100% !important;
+        padding: 0 !important;
+    }
+    section[data-content-field="main-content"] {
+        padding: 0px 17px !important;
+
+    @media screen and (max-width: 640px)
+        .sqs-layout.sqs-row.sqs-block:last-child,
+        .sqs-layout.sqs-row.sqs-block:first-child {
+            padding: 0px 17px !important;
+        }
+    }
+</style>
+<div class="map-container">
+    <div id="map"></div>
+    <div class="draggable-pane"></div>
+</div>
+<!-- Replace the value of the key parameter with your own API key. -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDP7hzqoCpx62MQD1apg_rZGkQFvbOrQdY&callback=initMap" async defer></script>
+
+<script>
+    let map;
+    let openInfoWindows = []
+
+    const setupMarkers = (locations) => {
+        // image for marker
+        let image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
+        for (var location of locations) {
+            let marker = new google.maps.Marker({
+                position: {
+                    lat: location.coordinates.latitude,
+                    lng: location.coordinates.longitude
+                },
+                map: map,
+                animation: google.maps.Animation.DROP,
+                title: "1"
+            });
+
+            // content in info window
+            let markerContent = `${location.name} </br> <i>Open now: ${location.hours ? location.hours[0].is_open_now ? "Yes" : "No" : "No data in yelp"}</i></br><img src="${location.image_url}" height="300" /></br><a href=\"https://google.maps.com\">Get Directions</a>`;
+
+            let infowindow = new google.maps.InfoWindow({
+                content: markerContent,
+                maxWidth: 1000,
+                maxHeight: 1000
+            });
+
+            marker.addListener('click', () => {
+                // close open windows if any
+                openInfoWindows.forEach(openWindow => {
+                    openWindow.close()
+                });
+                // reset windows
+                openInfoWindows = [];
+
+
+                openInfoWindows.push(infowindow)
+                infowindow.open(map, marker);
+            });
+        }
+    };
+
+    function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 12,
+            center: {
+                lat: 37.76,
+                lng: -122.445
+            },
+            streetViewControl: false,
+            mapTypeControl: false,
+            gestureHandling: 'greedy'
+        });
+    }
+
+    $(function() {
+        $.ajax({
+            url: "https://lacocinacache.herokuapp.com/all"
+        }).done(data => {
+            setupMarkers(data);
+        });
+    });
+</script>
+
