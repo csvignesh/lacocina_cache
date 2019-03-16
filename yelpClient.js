@@ -20,7 +20,8 @@ module.exports = {
         let retry = 0;
         let callSuccess = false;
         do {
-            if (retry > 1) {
+            if (retry > 0) {
+                console.log(`retrying ${id}`);
                 await appUtils.sleep(1000);
             }
             const options = {
