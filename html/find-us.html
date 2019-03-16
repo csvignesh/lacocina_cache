@@ -21,14 +21,18 @@
         width: 100% !important;
         padding: 0 !important;
     }
+    @media only screen and (max-width: 640px) {
+        .Site {
+            border: none !important;
+        }
+    }
     section[data-content-field="main-content"] {
         padding: 0px 17px !important;
+    }
 
-    @media screen and (max-width: 640px)
-        .sqs-layout.sqs-row.sqs-block:last-child,
-        .sqs-layout.sqs-row.sqs-block:first-child {
-            padding: 0px 17px !important;
-        }
+    .sqs-layout > .sqs-row > .col > .sqs-block.code-block.sqs-block-code {
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
     }
 </style>
 <div class="map-container">
