@@ -3,19 +3,18 @@
         height: calc(100% - 50px);
         width: 100%
     }
-
     .map-container {
         margin: 0;
-        height: 500px;
+        height: 600px;
         position: relative;
     }
-
-    .draggable-pane {
+    .slides-pane {
         background-color: white;
         width: 100%;
-        height: 50px;
+        height: 100px;
         position: absolute;
         bottom: 0;
+        overflow: scroll;
     }
     .sqs-block.code-block.sqs-block-code {
         width: 100% !important;
@@ -29,26 +28,61 @@
     section[data-content-field="main-content"] {
         padding: 0px 17px !important;
     }
-
     .sqs-layout > .sqs-row > .col > .sqs-block.code-block.sqs-block-code {
         padding-top: 0 !important;
         padding-bottom: 0 !important;
     }
+
+    table.lc_data {
+        font-family: Helvetica;
+    }
+
+    table.lc_data td {
+        vertical-align: top;
+    }
+
+    img.lc_poi_icon {
+        height: 30px;
+    }
+
+    div.lc_poi_title {
+        font-size: 20px;
+    }
+
+    td.lc_poi_details {
+        padding: 5px 10px;
+    }
+
+    div.lc_detail {
+        margin-top: 6px;
+    }
+
+    div.lc_poi_type,
+    div.lc_poi_address {
+        font-size: 12px;
+        color: grey;
+        font-weight: normal;
+    }
 </style>
 <div class="map-container">
     <div id="map"></div>
-    <div class="draggable-pane"></div>
+    <div class="slides-pane"></div>
 </div>
 <!-- Replace the value of the key parameter with your own API key. -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDP7hzqoCpx62MQD1apg_rZGkQFvbOrQdY&callback=initMap" async defer></script>
 
 <script>
     let map;
-    let openInfoWindows = []
-
+    const poiTemplate = '<div> <table class="lc_data"> <tr> <td> <img class="lc_poi_icon" src="https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">${1}</div><div class="lc_detail lc_poi_type">${2}</div><div class="lc_detail lc_poi_address">${3}</div></td></tr></table></div>';
+    const setupPoiSlides = (locations) => {
+        for (var location of locations) {
+            let html = poiTemplate.replace('${1}', location.name)
+            html = html.replace('${2}', location.categories.map(e => e.title).join(" &#183; "))
+            html = html.replace('${3}', location.location.display_address.join("<br>"));
+            $('.slides-pane').append(html)
+        }
+    };
     const setupMarkers = (locations) => {
-        // image for marker
-        let image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
         for (var location of locations) {
             let marker = new google.maps.Marker({
                 position: {
@@ -60,26 +94,8 @@
                 title: "1"
             });
 
-            // content in info window
-            let markerContent = `${location.name} </br> <i>Open now: ${location.hours ? location.hours[0].is_open_now ? "Yes" : "No" : "No data in yelp"}</i></br><img src="${location.image_url}" height="300" /></br><a href=\"https://google.maps.com\">Get Directions</a>`;
-
-            let infowindow = new google.maps.InfoWindow({
-                content: markerContent,
-                maxWidth: 1000,
-                maxHeight: 1000
-            });
-
             marker.addListener('click', () => {
-                // close open windows if any
-                openInfoWindows.forEach(openWindow => {
-                    openWindow.close()
-                });
-                // reset windows
-                openInfoWindows = [];
-
-
-                openInfoWindows.push(infowindow)
-                infowindow.open(map, marker);
+                console.log("do something when i click it");
             });
         }
     };
@@ -102,6 +118,7 @@
             url: "https://lacocinacache.herokuapp.com/all"
         }).done(data => {
             setupMarkers(data);
+            setupPoiSlides(data);
         });
     });
 </script>
