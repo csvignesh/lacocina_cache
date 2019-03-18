@@ -1,7 +1,7 @@
 <style>
     #map {
-        height: calc(100% - 50px);
-        width: 100%
+        height: calc(100% - 200px);
+        width: 100%;
     }
     .map-container {
         margin: 0;
@@ -11,10 +11,13 @@
     .slides-pane {
         background-color: white;
         width: 100%;
-        height: 100px;
         position: absolute;
+        height: 200px;
         bottom: 0;
+    }
+    .slides-pane-content {
         overflow: scroll;
+        height: calc(100% - 25px);
     }
     .sqs-block.code-block.sqs-block-code {
         width: 100% !important;
@@ -35,6 +38,8 @@
 
     table.lc_data {
         font-family: Helvetica;
+        line-height: normal;
+        margin: 10px;
     }
 
     table.lc_data td {
@@ -63,10 +68,25 @@
         color: grey;
         font-weight: normal;
     }
+    div.lc-drag {
+        padding: 10px 0 12px 0;
+    }
+    div.lc-up {
+        background-color: #dadce0;
+        border-radius: 50px;
+        height: 4px;
+        margin: 0 auto;
+        width: 24px;
+    }
 </style>
 <div class="map-container">
     <div id="map"></div>
-    <div class="slides-pane"></div>
+    <div class="slides-pane">
+        <div class="lc-drag">
+            <div class="lc-up"></div>
+        </div>
+        <div class="slides-pane-content" />
+    </div>
 </div>
 <!-- Replace the value of the key parameter with your own API key. -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDP7hzqoCpx62MQD1apg_rZGkQFvbOrQdY&callback=initMap" async defer></script>
@@ -79,7 +99,7 @@
             let html = poiTemplate.replace('${1}', location.name)
             html = html.replace('${2}', location.categories.map(e => e.title).join(" &#183; "))
             html = html.replace('${3}', location.location.display_address.join("<br>"));
-            $('.slides-pane').append(html)
+            $('.slides-pane-content').append(html)
         }
     };
     const setupMarkers = (locations) => {
@@ -91,7 +111,7 @@
                 },
                 map: map,
                 animation: google.maps.Animation.DROP,
-                title: "1"
+                title: location.name
             });
 
             marker.addListener('click', () => {
@@ -120,6 +140,13 @@
             setupMarkers(data);
             setupPoiSlides(data);
         });
+
+        $('.lc-drag').click(() => {
+            const expanded = !!$('.slides-pane').data("expanded");
+            $('.slides-pane').animate({
+                height: expanded ? "200" : "500"
+            });
+            $('.slides-pane').data("expanded", !expanded);
+        });
     });
 </script>
-
