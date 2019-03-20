@@ -55,6 +55,7 @@
 
     table.lc_data td {
         vertical-align: top;
+        cursor: pointer;
     }
 
     img.lc_poi_icon {
@@ -155,14 +156,20 @@
 <script>
     let map;
     let locations = [];
-    const poiTemplate = '<div> <table class="lc_data"> <tr> <td> <img class="lc_poi_icon" src="https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">${1}</div><div class="lc_detail lc_poi_type">${2}</div><div class="lc_detail lc_poi_address">${3}</div></td></tr></table></div>';
+    const poiTemplate = '<div> <table class="lc_data ${0}"> <tr> <td> <img class="lc_poi_icon" src="https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">${1}</div><div class="lc_detail lc_poi_type">${2}</div><div class="lc_detail lc_poi_address">${3}</div></td></tr></table></div>';
     const poiDetailedTemplate = '<div> <div class="lc_back_to_list">Back to list</div><table class="lc_data"> <tr> <td> <img class="lc_poi_icon" src="https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">${1}</div><div class="lc_detail lc_poi_type">${2}</div><div class="lc_detail lc_poi_address">${3}</div></td></tr></table> <div class="lc_poi_contact"> <img class="lc_poi_phone" src="https://static.thenounproject.com/png/56382-200.png"/>${4}</div><p class="lc_poi_write_up"> ${5}</p><a class="lc_poi_google_map" href="#">OPEN IN GOOGLE MAPS</a> <div class="lc_poi_photos"> <img class="lc_poi_photos_primary" src="https://cdn.vox-cdn.com/thumbor/dwvodCiM7CaMhqq6E1JLO6qJrKk=/0x0:1024x683/1200x800/filters:focal(431x261:593x423)/cdn.vox-cdn.com/uploads/chorus_image/image/55810987/eatersea1016_standard_bakery_official.0.0.jpg"/> <img class="lc_poi_photos_secondary" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSur0T-AeBLq4yLsEYau_VTsoRDpT46xlO0HUk1Dm02shhCZryQ"/> </div></div>';
     const setupPoiSlides = (locations) => {
+        $('.slides-pane-content').html("");
         for (var location of locations) {
             let html = poiTemplate.replace('${1}', location.name)
             html = html.replace('${2}', location.categories.map(e => e.title).join(" &#183; "))
             html = html.replace('${3}', location.location.display_address.join("<br>"));
+            html = html.replace('${0}', location.id);
+            const poiData = location;
             $('.slides-pane-content').append(html)
+            $(`.${location.id}`).click(() => {
+                setupPoiDetailedSlide(poiData);
+            });
         }
     };
     const setupPoiDetailedSlide = (poi) => {
@@ -172,6 +179,9 @@
         html = html.replace('${4}', poi.display_phone);
         html = html.replace('${5}', poi.writeUp || "Write up goes here");
         $('.slides-pane-content').html(html);
+        $('.lc_back_to_list').click(() => {
+            setupPoiSlides(locations);
+        });
         slidePaneExpCollapse(true);
     };
     const setupMarkers = (locations) => {
