@@ -19,6 +19,11 @@
         overflow: scroll;
         height: calc(100% - 25px);
     }
+    @media only screen and (min-width: 640px) {
+        .slides-pane-content > div {
+            display: inline-block;
+        }
+    }
     .sqs-block.code-block.sqs-block-code {
         width: 100% !important;
         padding: 0 !important;
@@ -40,6 +45,12 @@
         font-family: Helvetica;
         line-height: normal;
         margin: 10px;
+        min-width: 300px;
+    }
+    @media only screen and (min-width: 640px) {
+        table.lc_data {
+            min-height: 100px;
+        }
     }
 
     table.lc_data td {
@@ -78,6 +89,56 @@
         margin: 0 auto;
         width: 24px;
     }
+
+    /* detailed view */
+
+    .lc_back_to_list::before {
+        content: '\003C ';
+        font-size: 20px;
+        padding: 0 10px 0 5px;
+    }
+
+    .lc_back_to_list {
+        padding: 20px 10px;
+        font-weight: 100;
+        cursor: pointer;
+    }
+
+    .lc_poi_phone {
+        margin: 0 12px 0 14px;
+        height: 17px;
+    }
+
+    .lc_poi_contact {
+        color: #59223c;
+        font-size: 12px;
+    }
+
+    .lc_poi_write_up,
+    .lc_poi_photos {
+        padding: 10px;
+    }
+
+    a.lc_poi_google_map {
+        display: block;
+        border-radius: 10%;
+        border: 1px solid #59223c;
+        text-align: center;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 100;
+        max-width: 200px;
+        padding: 10px;
+        margin: 10px;
+        color: #59223c;
+    }
+
+    .lc_poi_photos_primary,
+    .lc_poi_photos_secondary {
+        height: 150px;
+    }
+
+    /* end detailed view */
 </style>
 <div class="map-container">
     <div id="map"></div>
@@ -93,7 +154,9 @@
 
 <script>
     let map;
+    let locations = [];
     const poiTemplate = '<div> <table class="lc_data"> <tr> <td> <img class="lc_poi_icon" src="https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">${1}</div><div class="lc_detail lc_poi_type">${2}</div><div class="lc_detail lc_poi_address">${3}</div></td></tr></table></div>';
+    const poiDetailedTemplate = '<div> <div class="lc_back_to_list">Back to list</div><table class="lc_data"> <tr> <td> <img class="lc_poi_icon" src="https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">${1}</div><div class="lc_detail lc_poi_type">${2}</div><div class="lc_detail lc_poi_address">${3}</div></td></tr></table> <div class="lc_poi_contact"> <img class="lc_poi_phone" src="https://static.thenounproject.com/png/56382-200.png"/>${4}</div><p class="lc_poi_write_up"> ${5}</p><a class="lc_poi_google_map" href="#">OPEN IN GOOGLE MAPS</a> <div class="lc_poi_photos"> <img class="lc_poi_photos_primary" src="https://cdn.vox-cdn.com/thumbor/dwvodCiM7CaMhqq6E1JLO6qJrKk=/0x0:1024x683/1200x800/filters:focal(431x261:593x423)/cdn.vox-cdn.com/uploads/chorus_image/image/55810987/eatersea1016_standard_bakery_official.0.0.jpg"/> <img class="lc_poi_photos_secondary" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSur0T-AeBLq4yLsEYau_VTsoRDpT46xlO0HUk1Dm02shhCZryQ"/> </div></div>';
     const setupPoiSlides = (locations) => {
         for (var location of locations) {
             let html = poiTemplate.replace('${1}', location.name)
@@ -101,6 +164,15 @@
             html = html.replace('${3}', location.location.display_address.join("<br>"));
             $('.slides-pane-content').append(html)
         }
+    };
+    const setupPoiDetailedSlide = (poi) => {
+        let html = poiDetailedTemplate.replace('${1}', poi.name)
+        html = html.replace('${2}', poi.categories.map(e => e.title).join(" &#183; "))
+        html = html.replace('${3}', poi.location.display_address.join("<br>"));
+        html = html.replace('${4}', poi.display_phone);
+        html = html.replace('${5}', poi.writeUp || "Write up goes here");
+        $('.slides-pane-content').html(html);
+        slidePaneExpCollapse(true);
     };
     const setupMarkers = (locations) => {
         for (var location of locations) {
@@ -113,9 +185,9 @@
                 animation: google.maps.Animation.DROP,
                 title: location.name
             });
-
+            const poiData = location;
             marker.addListener('click', () => {
-                console.log("do something when i click it");
+                setupPoiDetailedSlide(poiData);
             });
         }
     };
@@ -133,20 +205,23 @@
         });
     }
 
+    function slidePaneExpCollapse(exp) {
+        const expanded = exp ? false : !!$('.slides-pane').data("expanded");
+        $('.slides-pane').animate({
+            height: expanded ? "200" : "500"
+        });
+        $('.slides-pane').data("expanded", !expanded);
+    }
+
     $(function() {
         $.ajax({
             url: "https://lacocinacache.herokuapp.com/all"
         }).done(data => {
+            locations = data;
             setupMarkers(data);
             setupPoiSlides(data);
         });
 
-        $('.lc-drag').click(() => {
-            const expanded = !!$('.slides-pane').data("expanded");
-            $('.slides-pane').animate({
-                height: expanded ? "200" : "500"
-            });
-            $('.slides-pane').data("expanded", !expanded);
-        });
+        $('.lc-drag').click(() => {slidePaneExpCollapse();});
     });
 </script>
