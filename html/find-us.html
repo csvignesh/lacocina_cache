@@ -1,4 +1,7 @@
 <style>
+    section.Main-content {
+        max-width: none !important;
+    }
     #map {
         height: calc(100% - 200px);
         width: 100%;
@@ -16,7 +19,8 @@
         bottom: 0;
     }
     .slides-pane-content {
-        overflow: scroll;
+        overflow-y: scroll;
+        overflow-x: hidden;
         height: calc(100% - 25px);
     }
     @media only screen and (min-width: 640px) {
@@ -45,11 +49,16 @@
         font-family: Helvetica;
         line-height: normal;
         margin: 10px;
-        min-width: 300px;
+        margin-bottom: 40px;
+    }
+    table.lc_data.lc_data_details {
+        margin-bottom: 10px;
     }
     @media only screen and (min-width: 640px) {
         table.lc_data {
-            min-height: 100px;
+            min-height: 120px;
+            min-width: 300px;
+            margin-bottom: 5px;
         }
     }
 
@@ -71,7 +80,7 @@
     }
 
     div.lc_detail {
-        margin-top: 6px;
+        margin-top: 12px;
     }
 
     div.lc_poi_type,
@@ -94,13 +103,13 @@
     /* detailed view */
 
     .lc_back_to_list::before {
-        content: '\003C ';
+        content: "\003C ";
         font-size: 20px;
         padding: 0 10px 0 5px;
     }
 
     .lc_back_to_list {
-        padding: 20px 10px;
+        padding: 5px 5px;
         font-weight: 100;
         cursor: pointer;
     }
@@ -108,6 +117,7 @@
     .lc_poi_phone {
         margin: 0 12px 0 14px;
         height: 17px;
+        vertical-align: middle;
     }
 
     .lc_poi_contact {
@@ -115,28 +125,62 @@
         font-size: 12px;
     }
 
-    .lc_poi_write_up,
+    .lc_poi_write_up {
+        padding: 10px;
+    }
+
     .lc_poi_photos {
         padding: 10px;
+        width: 200%;
     }
 
     a.lc_poi_google_map {
         display: block;
-        border-radius: 10%;
         border: 1px solid #59223c;
         text-align: center;
         text-decoration: none;
         font-size: 16px;
         font-weight: 100;
-        max-width: 200px;
         padding: 10px;
-        margin: 10px;
+        margin: 10px 15px;
         color: #59223c;
+        border-radius: 50px;
+        -moz-border-radius: 50px;
+        -webkit-border-radius: 50px;
+    }
+
+    @media only screen and (max-width: 640px) {
+        a.lc_poi_google_map {
+            width: auto;
+        }
     }
 
     .lc_poi_photos_primary,
     .lc_poi_photos_secondary {
-        height: 150px;
+        max-height: 150px;
+        max-width: 38%;
+        padding: 4px;
+    }
+
+    .lc_poi_photos_primary {
+        max-width: 30% !important;
+    }
+
+    .lc_poi_photos_secondary_container {
+        position: relative;
+        text-align: center;
+        color: white;
+        max-width: 19% !important;
+        display: inline;
+    }
+
+    .lc_poi_photos_secondary_all_photos {
+        position: absolute;
+        bottom: 15px;
+        left: 16px;
+        background: rgba(0, 0, 255, 0.3);
+        padding: 5px;
+        border-radius: 5px;
     }
 
     /* end detailed view */
@@ -157,7 +201,7 @@
     let map;
     let locations = [];
     const poiTemplate = '<div> <table class="lc_data ${0}"> <tr> <td> <img class="lc_poi_icon" src="https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">${1}</div><div class="lc_detail lc_poi_type">${2}</div><div class="lc_detail lc_poi_address">${3}</div></td></tr></table></div>';
-    const poiDetailedTemplate = '<div> <div class="lc_back_to_list">Back to list</div><table class="lc_data"> <tr> <td> <img class="lc_poi_icon" src="https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">${1}</div><div class="lc_detail lc_poi_type">${2}</div><div class="lc_detail lc_poi_address">${3}</div></td></tr></table> <div class="lc_poi_contact"> <img class="lc_poi_phone" src="https://static.thenounproject.com/png/56382-200.png"/>${4}</div><p class="lc_poi_write_up"> ${5}</p><a class="lc_poi_google_map" href="#">OPEN IN GOOGLE MAPS</a> <div class="lc_poi_photos"> <img class="lc_poi_photos_primary" src="https://cdn.vox-cdn.com/thumbor/dwvodCiM7CaMhqq6E1JLO6qJrKk=/0x0:1024x683/1200x800/filters:focal(431x261:593x423)/cdn.vox-cdn.com/uploads/chorus_image/image/55810987/eatersea1016_standard_bakery_official.0.0.jpg"/> <img class="lc_poi_photos_secondary" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSur0T-AeBLq4yLsEYau_VTsoRDpT46xlO0HUk1Dm02shhCZryQ"/> </div></div>';
+    const poiDetailedTemplate = '<div> <div class="lc_back_to_list">back</div><table class="lc_data lc_data_details"> <tr> <td> <img class="lc_poi_icon" src="https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">${1}</div><div class="lc_detail lc_poi_type">${2}</div><div class="lc_detail lc_poi_address">${3}</div></td></tr></table> <div class="lc_poi_contact"> <img class="lc_poi_phone" src="https://static.thenounproject.com/png/56382-200.png"/>${4}</div><p class="lc_poi_write_up"> ${5}</p><a class="lc_poi_google_map" href="#">OPEN IN GOOGLE MAPS</a> <div class="lc_poi_photos"> <img class="lc_poi_photos_primary" src="${6}"/> <div class="lc_poi_photos_secondary_container"> <img class="lc_poi_photos_secondary" src="${7}"/> <div class="lc_poi_photos_secondary_all_photos"> All photos </div></div></div></div>';
     const setupPoiSlides = (locations) => {
         $('.slides-pane-content').html("");
         for (var location of locations) {
@@ -178,6 +222,8 @@
         html = html.replace('${3}', poi.location.display_address.join("<br>"));
         html = html.replace('${4}', poi.display_phone);
         html = html.replace('${5}', poi.writeUp || "Write up goes here");
+        html = html.replace('${6}', poi.photos[0]);
+        html = html.replace('${7}', poi.photos[1]);
         $('.slides-pane-content').html(html);
         $('.lc_back_to_list').click(() => {
             setupPoiSlides(locations);
