@@ -134,7 +134,7 @@
         width: 200%;
     }
 
-    a.lc_poi_google_map {
+    a.lc_poi_google_map a.lc_poi_yelp {
         display: block;
         border: 1px solid #59223c;
         text-align: center;
@@ -150,7 +150,7 @@
     }
 
     @media only screen and (max-width: 640px) {
-        a.lc_poi_google_map {
+        a.lc_poi_google_map a.lc_poi_yelp {
             width: auto;
         }
     }
@@ -200,8 +200,8 @@
 <script>
     let map;
     let locations = [];
-    const poiTemplate = '<div> <table class="lc_data ${0}"> <tr> <td> <img class="lc_poi_icon" src="https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">${1}</div><div class="lc_detail lc_poi_type">${2}</div><div class="lc_detail lc_poi_address">${3}</div></td></tr></table></div>';
-    const poiDetailedTemplate = '<div> <div class="lc_back_to_list">back</div><table class="lc_data lc_data_details"> <tr> <td> <img class="lc_poi_icon" src="https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cb959c10852294b7b876f6f/1555651009161/map-pin.png"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">${1}</div><div class="lc_detail lc_poi_type">${2}</div><div class="lc_detail lc_poi_address">${3}</div></td></tr></table> <div class="lc_poi_contact"> <img class="lc_poi_phone" src="https://static.thenounproject.com/png/56382-200.png"/>${4}</div><p class="lc_poi_write_up"> ${5}</p><a class="lc_poi_google_map" href="#">OPEN IN GOOGLE MAPS</a> <div class="lc_poi_photos"> <img class="lc_poi_photos_primary" src="${6}"/> <div class="lc_poi_photos_secondary_container"> <img class="lc_poi_photos_secondary" src="${7}"/> <div class="lc_poi_photos_secondary_all_photos"> All photos </div></div></div></div>';
+    const poiTemplate = '<div> <table class="lc_data ${0}"> <tr> <td> <img class="lc_poi_icon" src="/assests/map-pin.png"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">${1}</div><div class="lc_detail lc_poi_type">${2}</div><div class="lc_detail lc_poi_address">${3}</div></td></tr></table></div>';
+    const poiDetailedTemplate = '<div> <div class="lc_back_to_list">back</div><table class="lc_data lc_data_details"> <tr> <td> <img class="lc_poi_icon" src="/assests/map-pin.png"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">${1}</div><div class="lc_detail lc_poi_type">${2}</div><div class="lc_detail lc_poi_address">${3}</div></td></tr></table> <div class="lc_poi_contact"> <img class="lc_poi_phone" src="https://static.thenounproject.com/png/56382-200.png"/>${4}</div><p class="lc_poi_write_up"> ${5}</p><a class="lc_poi_google_map" href="#">OPEN IN GOOGLE MAPS</a> <a class="lc_poi_yelp" href="#">OPEN IN YELP</a> <div class="lc_poi_photos"> <img class="lc_poi_photos_primary" src="${6}"/> <div class="lc_poi_photos_secondary_container"> <img class="lc_poi_photos_secondary" src="${7}"/> <div class="lc_poi_photos_secondary_all_photos"> All photos </div></div></div></div>';
     const setupPoiSlides = (locations) => {
         $('.slides-pane-content').html("");
         for (var location of locations) {
@@ -240,7 +240,7 @@
                 map: map,
                 animation: google.maps.Animation.DROP,
                 title: location.name,
-                icon: 'https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cb959c10852294b7b876f6f/1555651009161/map-pin.png'
+                icon: '/assests/map-pin.png'
             });
             const poiData = location;
             marker.addListener('click', () => {
@@ -280,5 +280,11 @@
         });
 
         $('.lc-drag').click(() => {slidePaneExpCollapse();});
+        /*
+        $('.slides-pane').addEventListener('scroll', function() {
+            arrowTop.hidden = (pageYOffset < $('.slides-pane').clientHeight);
+        });;
+        */
+
     });
 </script>
