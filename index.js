@@ -28,10 +28,29 @@ app.get('/all', async (req, res) => {
             const details = await (yelpClient.getDataFor(id));
             resolve(details)
         });
-    }));
+    })).catch(error => {
+        console.log(error.message);
+    });
     res.send(data);
 });
 
 app.listen(app.get('port'), () => {
     console.log("Node app is running at localhost:" + app.get('port'));
+    warmUpCache();
 });
+
+const warmUpCache = async () => {
+    console.log("Warming up - yelp data");
+    const ids = await (gSheetClient.getSheetData());
+    for (const id of ids) {
+        try {
+            const data = await yelpClient.getDataFor(id);
+            if(!data.id) {
+                console.error(`Error fetching ${id}`);
+            }
+        } catch(e) {
+            console.log(`Exception while fetching ${id}`, e)
+        }
+    };
+    console.log(`warmed up - ${ids.length}`);
+};
