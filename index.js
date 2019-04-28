@@ -22,10 +22,11 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/all', async (req, res) => {
-    const ids = await (gSheetClient.getSheetData());
-    const data = await Promise.all(ids.map(id => {
+    const places = await (gSheetClient.getSheetData());
+    const data = await Promise.all(places.map(place => {
         return new Promise(async (resolve) => {
-            const details = await (yelpClient.getDataFor(id));
+            const details = await (yelpClient.getDataFor(place.id));
+            details.pinType = place.pinType;
             resolve(details)
         });
     })).catch(error => {
@@ -41,16 +42,16 @@ app.listen(app.get('port'), () => {
 
 const warmUpCache = async () => {
     console.log("Warming up - yelp data");
-    const ids = await (gSheetClient.getSheetData());
-    for (const id of ids) {
+    const places = await (gSheetClient.getSheetData());
+    for (const place of places) {
         try {
-            const data = await yelpClient.getDataFor(id);
+            const data = await yelpClient.getDataFor(place.id);
             if(!data.id) {
-                console.error(`Error fetching ${id}`);
+                console.error(`Error fetching ${place.id}`);
             }
         } catch(e) {
-            console.log(`Exception while fetching ${id}`, e)
+            console.log(`Exception while fetching ${place.id}`, e)
         }
     };
-    console.log(`warmed up - ${ids.length}`);
+    console.log(`warmed up - ${places.length}`);
 };
