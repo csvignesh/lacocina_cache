@@ -161,35 +161,6 @@
         }
     }
 
-    button.lc_filter_button {
-      
-      height: 40px;
-      border-radius: 3px;
-      border: solid 2px #59223c;
-      background-color: #ffffff;
-    }
-
-    a.lc_filter_text {
-        width: 72px;
-        height: 19px;
-        font-family: Knockout-48Featherweight;
-        font-size: 16px;
-        font-weight: normal;
-        font-style: normal;
-        font-stretch: normal;
-        line-height: normal;
-        letter-spacing: 0.8px;
-        color: #59223c;
-}
-
-    tr.lc_filter_panel {
-      width: 375px;
-      height: 56px;
-      object-fit: contain;
-      box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.21);
-      background-color: #f5f4ef;
-    }
-
     .lc_poi_photos_primary,
     .lc_poi_photos_secondary {
         max-height: 134px;
@@ -219,6 +190,56 @@
     }
 
     /* end detailed view */
+
+    /* begin filters */
+    .lc_filters {
+        display: block !important;
+        padding: 0px 10px 10px 10px;
+    }
+
+    .lc_filter {
+        display: inline-block;
+        border: 2px solid #59223c;
+        padding: 8px 10px;
+        border-radius: 3px;
+        margin-right: 12px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .lc_filter_selected {
+        background-color: #DDDDDD;
+    }
+
+    div.arrow-down {
+        display: inline-block;
+        width: 0;
+        height: 2px;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid #2f2f2f;
+        font-size: 0;
+        line-height: 0;
+    }
+
+    .lc_detailed_filter {
+        padding: 10px;
+    }
+
+    .lc_detailed_filter_mealType {
+        font-size: 20px;
+    }
+
+    .lc_df_mealType_entries {
+        margin-top: 10px;
+        border-collapse: collapse;
+    }
+
+    .lc_df_mealType_entries td {
+        padding: 20px;
+        border: 1px solid #979797;
+    }
+    /* end filters */
 </style>
 <div class="map-container">
     <div id="map"></div>
@@ -235,31 +256,40 @@
 <script>
     let map;
     let locations = [];
-        
-    const poiTemplate = '<div><div class="lc_filter_panel"><a class="lc_filter_button" href="#">RESTAURANTS</a><a class="lc_filter_button" href="#">PRODUCTS</a><a class="lc_filter_button" href="#">CUSINE</a></div><table class="lc_data ${0}"> <tr class="lc_filter_panel"></tr> <tr> <td> <img class="lc_poi_icon" src="https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cb959c10852294b7b876f6f/1555651009161/map-pin.png"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">${1}</div><div class="lc_detail lc_poi_type">${2}</div><div class="lc_detail lc_poi_address">${3}</div></td></tr></table></div>';
-    const poiDetailedTemplate = '<div> <div class="lc_back_to_list">back to list</div><table class="lc_data lc_data_details"> <tr> <td> <img class="lc_poi_icon" src="https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cb959c10852294b7b876f6f/1555651009161/map-pin.png"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">${1}</div><div class="lc_detail lc_poi_type">${2}</div><div class="lc_detail lc_poi_address">${3}</div></td></tr></table> <div class="lc_poi_contact"> <img class="lc_poi_phone" src="https://static.thenounproject.com/png/56382-200.png"/>${4}</div><p class="lc_poi_write_up"> ${5}</p><a class="lc_poi_google_map" href="#">OPEN IN GOOGLE MAPS</a> <a class="lc_poi_yelp" href="#">OPEN IN YELP</a> <div class="lc_poi_photos"> <img class="lc_poi_photos_primary" src="${6}"/> <div class="lc_poi_photos_secondary_container"> <img class="lc_poi_photos_secondary" src="${7}"/> <div class="lc_poi_photos_secondary_all_photos"> All photos </div></div></div></div>';
+    const pinUrl = 'https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cc6196124a694497454eebb/1556486497277/pin.png';
+    const filters = `<div class="lc_filters"> <div class="lc_filter" >Restaurants</div><div class="lc_filter" data-type="products">Products</div><div class="lc_filter" data-type="cuisine">Cuisine <div class="arrow-down"></div></div></div>`;
+    const poiTemplate = `<div><table class="lc_data $0"><tr> <td> <img class="lc_poi_icon" src="${pinUrl}"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">$1</div><div class="lc_detail lc_poi_type">$2</div><div class="lc_detail lc_poi_address">$3</div></td></tr></table></div>`;
+    const poiDetailedTemplate = `<div> <div class="lc_back_to_list">back to list</div><table class="lc_data lc_data_details"> <tr> <td> <img class="lc_poi_icon" src="${pinUrl}"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">$1</div><div class="lc_detail lc_poi_type">$2</div><div class="lc_detail lc_poi_address">$3</div></td></tr></table> <div class="lc_poi_contact"> <img class="lc_poi_phone" src="https://static.thenounproject.com/png/56382-200.png"/>$4</div><p class="lc_poi_write_up"> $5</p><a class="lc_poi_google_map" href="#">OPEN IN GOOGLE MAPS</a> <a class="lc_poi_yelp" href="#">OPEN IN YELP</a> <div class="lc_poi_photos"> <img class="lc_poi_photos_primary" src="$6"/> <div class="lc_poi_photos_secondary_container"> <img class="lc_poi_photos_secondary" src="$7"/> <div class="lc_poi_photos_secondary_all_photos"> All photos </div></div></div></div>`;
     const setupPoiSlides = (locations) => {
         $('.slides-pane-content').html("");
+        $('.slides-pane-content').append(filters);
         for (var location of locations) {
-            let html = poiTemplate.replace('${1}', location.name)
-            html = html.replace('${2}', location.categories.map(e => e.title).join(" &#183; "))
-            html = html.replace('${3}', location.location.display_address.join("<br>"));
-            html = html.replace('${0}', location.id);
+            let html = poiTemplate.replace('$1', location.name);
+            html = html.replace('$2', location.categories.map(e => e.title).join(" &#183; "));
+            html = html.replace('$3', location.location.display_address.join("<br>"));
+            html = html.replace('$0', location.id);
             const poiData = location;
-            $('.slides-pane-content').append(html)
+            $('.slides-pane-content').append(html);
             $(`.${location.id}`).click(() => {
                 setupPoiDetailedSlide(poiData);
             });
         }
+        $('.lc_filter').off('click');
+        $('.lc_filter').click(function() {
+            const pinType = $(this).data('type');
+            locations.forEach(e => {
+
+            });
+        });
     };
     const setupPoiDetailedSlide = (poi) => {
-        let html = poiDetailedTemplate.replace('${1}', poi.name)
-        html = html.replace('${2}', poi.categories.map(e => e.title).join(" &#183; "))
-        html = html.replace('${3}', poi.location.display_address.join("<br>"));
-        html = html.replace('${4}', poi.display_phone);
-        html = html.replace('${5}', poi.writeUp || "Write up goes here");
-        html = html.replace('${6}', poi.photos[0]);
-        html = html.replace('${7}', poi.photos[1]);
+        let html = poiDetailedTemplate.replace('$1', poi.name);
+        html = html.replace('$2', poi.categories.map(e => e.title).join(" &#183; "));
+        html = html.replace('$3', poi.location.display_address.join("<br>"));
+        html = html.replace('$4', poi.display_phone);
+        html = html.replace('$5', poi.writeUp || "Write up goes here");
+        html = html.replace('$6', poi.photos[0]);
+        html = html.replace('$7', poi.photos[1]);
         $('.slides-pane-content').html(html);
         $('.lc_back_to_list').click(() => {
             setupPoiSlides(locations);
@@ -276,12 +306,13 @@
                 map: map,
                 animation: google.maps.Animation.DROP,
                 title: location.name,
-                icon: 'https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cb959c10852294b7b876f6f/1555651009161/map-pin.png'
+                icon: pinUrl
             });
             const poiData = location;
             marker.addListener('click', () => {
                 setupPoiDetailedSlide(poiData);
             });
+            location.marker = marker;
         }
     };
 
@@ -316,11 +347,5 @@
         });
 
         $('.lc-drag').click(() => {slidePaneExpCollapse();});
-        /*
-        $('.slides-pane').addEventListener('scroll', function() {
-            arrowTop.hidden = (pageYOffset < $('.slides-pane').clientHeight);
-        });;
-        */
-
     });
 </script>
