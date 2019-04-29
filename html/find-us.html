@@ -25,7 +25,7 @@
         background-color: #f5f4ef;
     }
     @media only screen and (min-width: 640px) {
-        .slides-pane-content > div {
+        .lc_poi_slides > div {
             display: inline-block;
         }
     }
@@ -207,8 +207,9 @@
         cursor: pointer;
     }
 
-    .lc_filter_selected {
-        background-color: #DDDDDD;
+    .lc_filter.selected {
+        background-color: #59223c;
+        color: white;
     }
 
     div.arrow-down {
@@ -247,7 +248,16 @@
         <div class="lc-drag">
             <div class="lc-up"></div>
         </div>
-        <div class="slides-pane-content" />
+        <div class="slides-pane-content">
+            <div class="lc_filters">
+                <div class="lc_filter" pinType="restaurant">Restaurants</div>
+                <div class="lc_filter" pinType="shared_production_facility">Products</div>
+                <div class="lc_filter" data-type="cuisine">Cuisine
+                    <div class="arrow-down"></div>
+                </div>
+            </div>
+            <div class="lc_poi_slides"></div>
+        </div>
     </div>
 </div>
 <!-- Replace the value of the key parameter with your own API key. -->
@@ -256,31 +266,23 @@
 <script>
     let map;
     let locations = [];
+    let currentFilters = [];
     const pinUrl = 'https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cc6196124a694497454eebb/1556486497277/pin.png';
-    const filters = `<div class="lc_filters"> <div class="lc_filter" >Restaurants</div><div class="lc_filter" data-type="products">Products</div><div class="lc_filter" data-type="cuisine">Cuisine <div class="arrow-down"></div></div></div>`;
     const poiTemplate = `<div><table class="lc_data $0"><tr> <td> <img class="lc_poi_icon" src="${pinUrl}"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">$1</div><div class="lc_detail lc_poi_type">$2</div><div class="lc_detail lc_poi_address">$3</div></td></tr></table></div>`;
     const poiDetailedTemplate = `<div> <div class="lc_back_to_list">back to list</div><table class="lc_data lc_data_details"> <tr> <td> <img class="lc_poi_icon" src="${pinUrl}"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">$1</div><div class="lc_detail lc_poi_type">$2</div><div class="lc_detail lc_poi_address">$3</div></td></tr></table> <div class="lc_poi_contact"> <img class="lc_poi_phone" src="https://static.thenounproject.com/png/56382-200.png"/>$4</div><p class="lc_poi_write_up"> $5</p><a class="lc_poi_google_map" href="#">OPEN IN GOOGLE MAPS</a> <a class="lc_poi_yelp" href="#">OPEN IN YELP</a> <div class="lc_poi_photos"> <img class="lc_poi_photos_primary" src="$6"/> <div class="lc_poi_photos_secondary_container"> <img class="lc_poi_photos_secondary" src="$7"/> <div class="lc_poi_photos_secondary_all_photos"> All photos </div></div></div></div>`;
     const setupPoiSlides = (locations) => {
-        $('.slides-pane-content').html("");
-        $('.slides-pane-content').append(filters);
+        $('.lc_poi_slides').html("");
         for (var location of locations) {
             let html = poiTemplate.replace('$1', location.name);
             html = html.replace('$2', location.categories.map(e => e.title).join(" &#183; "));
             html = html.replace('$3', location.location.display_address.join("<br>"));
             html = html.replace('$0', location.id);
             const poiData = location;
-            $('.slides-pane-content').append(html);
+            $('.lc_poi_slides').append(html);
             $(`.${location.id}`).click(() => {
                 setupPoiDetailedSlide(poiData);
             });
         }
-        $('.lc_filter').off('click');
-        $('.lc_filter').click(function() {
-            const pinType = $(this).data('type');
-            locations.forEach(e => {
-
-            });
-        });
     };
     const setupPoiDetailedSlide = (poi) => {
         let html = poiDetailedTemplate.replace('$1', poi.name);
@@ -290,8 +292,10 @@
         html = html.replace('$5', poi.writeUp || "Write up goes here");
         html = html.replace('$6', poi.photos[0]);
         html = html.replace('$7', poi.photos[1]);
-        $('.slides-pane-content').html(html);
+        $('.lc_poi_slides').html(html);
+        $('.lc_filters').attr('style','display:none !important');
         $('.lc_back_to_list').click(() => {
+            $('.lc_filters').attr('style', '');
             setupPoiSlides(locations);
         });
         slidePaneExpCollapse(true);
@@ -318,7 +322,7 @@
 
     function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 12,
+            zoom: 13,
             center: {
                 lat: 37.76,
                 lng: -122.445
@@ -342,8 +346,33 @@
             url: "https://lacocinacache.herokuapp.com/all"
         }).done(data => {
             locations = data;
+
             setupMarkers(data);
             setupPoiSlides(data);
+
+            $('.lc_filter').click(function() {
+                const interactedPinType = $(this).attr('pintype');
+                const pinIndex = currentFilters.indexOf(interactedPinType);
+                if(pinIndex > -1) {
+                    currentFilters.splice(pinIndex, 1);
+                    $(this).removeClass('selected');
+                } else {
+                    currentFilters.push(interactedPinType);
+                    $(this).addClass('selected');
+                }
+                setupPoiSlides(locations.filter(location => {
+                    if(currentFilters.length == 0) {
+                        location.marker.setMap(map);
+                        return true;
+                    } else if(currentFilters.indexOf(location.pinType) > -1) {
+                        location.marker.setMap(map);
+                        return true;
+                    } else {
+                        location.marker.setMap(null);
+                        return false;
+                    }
+                }));
+            });
         });
 
         $('.lc-drag').click(() => {slidePaneExpCollapse();});
