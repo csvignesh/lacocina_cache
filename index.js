@@ -22,16 +22,36 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/all', async (req, res) => {
-    const ids = await (gSheetClient.getSheetData());
-    const data = await Promise.all(ids.map(id => {
+    const places = await (gSheetClient.getSheetData());
+    const data = await Promise.all(places.map(place => {
         return new Promise(async (resolve) => {
-            const details = await (yelpClient.getDataFor(id));
+            const details = await (yelpClient.getDataFor(place.id));
+            details.pinType = place.pinType;
             resolve(details)
         });
-    }));
+    })).catch(error => {
+        console.log(error.message);
+    });
     res.send(data);
 });
 
 app.listen(app.get('port'), () => {
     console.log("Node app is running at localhost:" + app.get('port'));
+    warmUpCache();
 });
+
+const warmUpCache = async () => {
+    console.log("Warming up - yelp data");
+    const places = await (gSheetClient.getSheetData());
+    for (const place of places) {
+        try {
+            const data = await yelpClient.getDataFor(place.id);
+            if(!data.id) {
+                console.error(`Error fetching ${place.id}`);
+            }
+        } catch(e) {
+            console.log(`Exception while fetching ${place.id}`, e)
+        }
+    };
+    console.log(`warmed up - ${places.length}`);
+};

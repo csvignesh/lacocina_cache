@@ -31,8 +31,7 @@ module.exports = {
                 }
             };
 
-            options.url = options.url.replace('{id}', id);
-
+            options.url = options.url.replace('{id}', encodeURIComponent(id));
             const data = await (util.promisify(request.get)(options));
             const responseData = JSON.parse(data.body);
 

@@ -18,12 +18,17 @@ module.exports = {
         const sheets = google.sheets({version: 'v4', auth});
         const response = await (util.promisify(sheets.spreadsheets.values.get)({
             spreadsheetId: id,
-            range: 'A1:A100'
+            range: 'A1:B100'
         }));
 
         if (response.data.values.length) {
             // give out only first column data which is not empty
-            return response.data.values.map(e => e[0]).filter(e => !!e);
+            return response.data.values.map(e => {
+                return {
+                    id: e[0],
+                    pinType: (e[1] || "").toLowerCase().trim().split(" ").join("_")
+                }
+            }).filter(e => !!e.id);
         } else {
             console.log('No data found.');
             return [];
