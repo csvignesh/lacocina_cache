@@ -3,31 +3,84 @@
         max-width: none !important;
     }
     #map {
-        height: calc(100% - 200px);
         width: 100%;
+    }
+    @media only screen and (max-width: 640px) {
+        #map {
+            height: calc(100% - 300px);
+        }
+        .map-container {
+            padding-top: 0 !important;
+        }
+        .lc_hr {
+            display: none;
+        }
+        .lc_filters {
+            padding: 0px 10px 10px 0px !important;
+        }
+        .map-container > div {
+            display: block !important;
+        }
+        .slides-pane {
+            position: absolute;
+        }
+        .lc_filters {
+            box-shadow: none !important;
+        }
+        .lc_poi_slides {
+            margin-top: 0 !important;
+        }
+    }
+    .slides-pane {
+        overflow: scroll;
     }
     .map-container {
         margin: 0;
         height: 600px;
+        width: 100%;
         position: relative;
+        padding-top: 25px;
+    }
+    .map-container > div {
+        display: inline-block;
+    }
+    .lc-desktop {
+        padding-left: 10px;
+    }
+    .lc-mobile {
+        padding: 0 10px;
+    }
+    @media only screen and (min-width: 640px) {
+        #map, .lc-desktop {
+            height: 100%;
+        }
+        .lc-desktop {
+            width: 25%;
+        }
+        #map {
+            width: 74%;
+        }
+    }
+    .lc_hr {
+        height: 10px;
+        background-color: #59223c;
+        border-radius: 5px;
+        margin: 0;
     }
     .slides-pane {
         background-color: #f5f4ef;
-        width: 100%;
-        position: absolute;
-        height: 200px;
         bottom: 0;
+    }
+    @media only screen and (max-width: 640px) {
+        .slides-pane {
+            height: 300px;
+        }
     }
     .slides-pane-content {
         overflow-y: scroll;
         overflow-x: hidden;
         height: calc(100% - 25px);
         background-color: #f5f4ef;
-    }
-    @media only screen and (min-width: 640px) {
-        .lc_poi_slides > div {
-            display: inline-block;
-        }
     }
     .sqs-block.code-block.sqs-block-code {
         width: 100% !important;
@@ -44,6 +97,10 @@
     .sqs-layout > .sqs-row > .col > .sqs-block.code-block.sqs-block-code {
         padding-top: 0 !important;
         padding-bottom: 0 !important;
+    }
+
+    .lc_poi_slides {
+        margin-top: 20px;
     }
 
     table.lc_data {
@@ -194,7 +251,8 @@
     /* begin filters */
     .lc_filters {
         display: block !important;
-        padding: 0px 10px 10px 10px;
+        padding: 15px 10px 15px 0px;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.21);
     }
 
     .lc_filter {
@@ -205,6 +263,7 @@
         margin-right: 12px;
         font-size: 14px;
         cursor: pointer;
+        background-color: white;
     }
 
     .lc_filter.selected {
@@ -243,20 +302,11 @@
     /* end filters */
 </style>
 <div class="map-container">
+    <div class="slides-pane lc-desktop"></div>
     <div id="map"></div>
-    <div class="slides-pane">
+    <div class="slides-pane lc-mobile">
         <div class="lc-drag">
             <div class="lc-up"></div>
-        </div>
-        <div class="slides-pane-content">
-            <div class="lc_filters">
-                <div class="lc_filter" pinType="restaurant">Restaurants</div>
-                <div class="lc_filter" pinType="shared_production_facility">Products</div>
-                <div class="lc_filter" data-type="cuisine">Cuisine
-                    <div class="arrow-down"></div>
-                </div>
-            </div>
-            <div class="lc_poi_slides"></div>
         </div>
     </div>
 </div>
@@ -265,8 +315,10 @@
 
 <script>
     let map;
+    let isMobile = false;
     let locations = [];
     let currentFilters = [];
+    const filtersAndBaseDOM = '<div class=""><hr class="lc_hr"><div class="slides-pane-content"> <div class="lc_filters"> <div class="lc_filter" pinType="restaurant">Restaurants</div><div class="lc_filter" pinType="shared_production_facility">Products</div><div class="lc_filter" data-type="cuisine">Cuisine <div class="arrow-down"></div></div></div><div class="lc_poi_slides"></div></div></div>';
     const pinUrl = 'https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cc6196124a694497454eebb/1556486497277/pin.png';
     const poiTemplate = `<div><table class="lc_data $0"><tr> <td> <img class="lc_poi_icon" src="${pinUrl}"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">$1</div><div class="lc_detail lc_poi_type">$2</div><div class="lc_detail lc_poi_address">$3</div></td></tr></table></div>`;
     const poiDetailedTemplate = `<div> <div class="lc_back_to_list">back to list</div><table class="lc_data lc_data_details"> <tr> <td> <img class="lc_poi_icon" src="${pinUrl}"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">$1</div><div class="lc_detail lc_poi_type">$2</div><div class="lc_detail lc_poi_address">$3</div></td></tr></table> <div class="lc_poi_contact"> <img class="lc_poi_phone" src="https://static.thenounproject.com/png/56382-200.png"/>$4</div><p class="lc_poi_write_up"> $5</p><a class="lc_poi_google_map" href="#">OPEN IN GOOGLE MAPS</a> <a class="lc_poi_yelp" href="#">OPEN IN YELP</a> <div class="lc_poi_photos"> <img class="lc_poi_photos_primary" src="$6"/> <div class="lc_poi_photos_secondary_container"> <img class="lc_poi_photos_secondary" src="$7"/> <div class="lc_poi_photos_secondary_all_photos"> All photos </div></div></div></div>`;
@@ -334,11 +386,13 @@
     }
 
     function slidePaneExpCollapse(exp) {
-        const expanded = exp ? false : !!$('.slides-pane').data("expanded");
-        $('.slides-pane').animate({
-            height: expanded ? "200" : "500"
-        });
-        $('.slides-pane').data("expanded", !expanded);
+        if (isMobile) {
+            const expanded = exp ? false : !!$('.slides-pane').data("expanded");
+            $('.slides-pane').animate({
+                height: expanded ? "300" : "500"
+            });
+            $('.slides-pane').data("expanded", !expanded);
+        }
     }
 
     $(function() {
@@ -347,13 +401,24 @@
         }).done(data => {
             locations = data;
 
+            const $desktop = $('.lc-desktop');
+            const $mobile = $('.lc-mobile');
+            if (screen.width > 640) {
+                $mobile.remove();
+                $desktop.append($(filtersAndBaseDOM));
+            } else {
+                isMobile = true;
+                $desktop.remove();
+                $mobile.append($(filtersAndBaseDOM));
+            }
+
             setupMarkers(data);
             setupPoiSlides(data);
 
             $('.lc_filter').click(function() {
                 const interactedPinType = $(this).attr('pintype');
                 const pinIndex = currentFilters.indexOf(interactedPinType);
-                if(pinIndex > -1) {
+                if (pinIndex > -1) {
                     currentFilters.splice(pinIndex, 1);
                     $(this).removeClass('selected');
                 } else {
