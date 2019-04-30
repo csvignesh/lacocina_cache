@@ -357,6 +357,8 @@
         html = html.replace('$5', poi.writeUp || "Write up goes here");
         html = html.replace('$6', poi.photos[0]);
         html = html.replace('$7', poi.photos[1]);
+        let pinUrl = ('restaurant' == poi.pinType || 'cafe' == poi.pinType) ? restaurantPinURL : otherPinURL;
+        html = html.replace('$pinUrl', pinUrl);
         $('.lc_poi_slides').html(html);
         $('.lc_filters').attr('style','display:none !important');
         $('.lc_back_to_list').click(() => {
