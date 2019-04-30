@@ -336,14 +336,11 @@
     const setupPoiSlides = (locations) => {
         $('.lc_poi_slides').html("");
         for (var location of locations) {
-            console.log(location);
             let html = poiTemplate.replace('$1', location.name);
             html = html.replace('$2', location.categories.map(e => e.title).join(" &#183; "));
             html = html.replace('$3', location.location.display_address.join("<br>"));
             html = html.replace('$0', location.id);
-            //console.log(location.pinType);
             let pinUrl = ('restaurant' == location.pinType || 'cafe' == location.pinType) ? restaurantPinURL : otherPinURL;
-            //let pinUrl =  restaurantPinURL;
             html = html.replace('$pinUrl', pinUrl);
             const poiData = location;
             $('.lc_poi_slides').append(html);
