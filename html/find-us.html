@@ -25,6 +25,7 @@
         .slides-pane {
             position: absolute;
             scroll-behavior: smooth;
+            width: 100%;
         }
         .lc_filter {
             font-size: 12px !important;
@@ -32,6 +33,9 @@
         }
         .lc_poi_slides {
             margin-top: 0 !important;
+        }
+        .lc-slides-and-filters {
+            padding: 0 10px;
         }
     }
     .slides-pane {
@@ -49,9 +53,6 @@
     }
     .lc-desktop {
         padding-left: 10px;
-    }
-    .lc-mobile {
-        padding: 0 10px;
     }
     @media only screen and (min-width: 640px) {
         #map, .lc-desktop {
@@ -227,6 +228,7 @@
         max-height: 134px;
         max-width: 38%;
         padding: 4px;
+        cursor: pointer;
     }
 
     .lc_poi_photos_primary {
@@ -309,6 +311,42 @@
         border: 1px solid #979797;
     }
     /* end filters */
+
+    /* begin image grid */
+    .lc_images {
+        overflow: scroll;
+    }
+
+    .lc_images_back_banner {
+        background-color: #59223c;
+        cursor: pointer;
+    }
+
+    .lc_images_back_banner_text {
+        padding: 10px 5px;
+        color: white;
+    }
+
+    .lc_images_back_banner_text::before {
+        content: "\003C ";
+        font-size: 16px;
+        padding: 0 10px 0 5px;
+    }
+
+    .lc_images_grid {
+        padding: 0 10px;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .lc_images_grid td {
+        height: 95px;
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: center center;
+    }
+
+    /* end image grid */
 </style>
 <div class="map-container">
     <div class="slides-pane lc-desktop"></div>
@@ -333,6 +371,7 @@
     const otherPinURL = 'https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cc7eff9ee6eb06c45420380/1556606969107/OrangePin.png';
     const poiTemplate = `<div><table class="lc_data $0"><tr> <td> <img class="lc_poi_icon" src="$pinUrl"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">$1</div><div class="lc_detail lc_poi_type">$2</div><div class="lc_detail lc_poi_address">$3</div></td></tr></table></div>`;
     const poiDetailedTemplate = `<div> <div class="lc_back_to_list">back to list</div><table class="lc_data lc_data_details"> <tr> <td> <img class="lc_poi_icon" src="$pinUrl"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">$1</div><div class="lc_detail lc_poi_type">$2</div><div class="lc_detail lc_poi_address">$3</div></td></tr></table> <div class="lc_poi_contact"> <img class="lc_poi_phone" src="https://static.thenounproject.com/png/56382-200.png"/>$4</div><p class="lc_poi_write_up"> $5</p><div class="lc_poi_links"><a class="lc_poi_google_map" href="#">OPEN IN GOOGLE MAPS</a> <a class="lc_poi_yelp" href="#">OPEN IN YELP</a></div> <div class="lc_poi_photos"> <img class="lc_poi_photos_primary" src="$6"/> <div class="lc_poi_photos_secondary_container"> <img class="lc_poi_photos_secondary" src="$7"/> <button class="lc_poi_photos_secondary_all_photos" onClick="showAllPhotos()">All photos</button></div></div></div>`;
+    const photoGrid = '<div class="lc_images"> <div class="lc_images_back_banner"> <div class="lc_images_back_banner_text"> $title </div></div><table class="lc_images_grid">$imageRows</table></div>';
 
     const createDetailedFilter = () => {
         const cuisines = [];
@@ -377,14 +416,30 @@
         html = html.replace('$5', poi.writeUp || "Write up goes here");
         html = html.replace('$6', poi.photos[0]);
         html = html.replace('$7', poi.photos[1]);
-        html = html.replace('$pinUrl', location.pinType == 'restaurant' ? restaurantPinURL : otherPinURL);
+        html = html.replace('$pinUrl', poi.pinType == 'restaurant' ? restaurantPinURL : otherPinURL);
         $('.lc_poi_slides').html(html);
         $('.lc_filters').attr('style','display:none !important');
         $('.lc_back_to_list').click(() => {
             $('.lc_filters').attr('style', '');
             setupPoiSlides(locations);
         });
+        $('.lc_poi_photos').click(() => {
+            setupPhotoGrid(poi);
+        });
         slidePaneExpCollapse(true);
+    };
+    const setupPhotoGrid = (poi) => {
+        $('.lc_hr').hide();
+        let html = photoGrid.replace('$title', poi.name);
+        let rows = [];
+        for(var i=0; i<(poi.photos || []).length; i+=3) {
+            rows.push(`<tr><td style="background-image: url(${poi.photos[i]});"></td><td style="background-image: url(${poi.photos[i+1] || ''});"></td><td style="background-image: url(${poi.photos[i+2] || ''});"></td></tr>`);
+        }
+        html = html.replace('$imageRows', rows.join(''));
+        $('.lc_poi_slides').html(html);
+        $('.lc_images_back_banner').click(() => {
+            setupPoiDetailedSlide(poi);
+        });
     };
     const setupMarkers = (locations) => {
         for (var location of locations) {
