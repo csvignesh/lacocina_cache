@@ -604,7 +604,9 @@
 
     $(function() {
         $.ajax({
-            url: "https://lacocinacache.herokuapp.com/all"
+            url: `https://lacocinacache.herokuapp.com/all?r=${Math.random()}`,
+            timeout: 2000,
+            retryLimit: 3
         }).done(data => {
             locations = data;
 
