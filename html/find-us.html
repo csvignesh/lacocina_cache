@@ -2,12 +2,11 @@
     section.Main-content {
         max-width: none !important;
     }
-    #map {
-        width: 100%;
-    }
+
     @media only screen and (max-width: 640px) {
         #map {
             height: calc(100% - 300px);
+            width: 100%;
         }
         .map-container {
             padding-top: 0 !important;
@@ -18,9 +17,6 @@
         .lc_filters {
             padding: 0px 10px 10px 0px !important;
             box-shadow: none !important;
-        }
-        .map-container > div {
-            display: block !important;
         }
         .slides-pane {
             position: absolute;
@@ -38,6 +34,10 @@
             padding: 0 10px;
         }
     }
+    .slides-pane.lc-desktop{
+        float: left;
+        min-width: 400px;
+    }
     .slides-pane {
         overflow: scroll;
     }
@@ -48,21 +48,12 @@
         position: relative;
         padding-top: 25px;
     }
-    .map-container > div {
-        display: inline-block;
-    }
-    .lc-desktop {
+    .lc-slides-and-filters {
         padding-left: 10px;
     }
     @media only screen and (min-width: 640px) {
         #map, .lc-desktop {
             height: 100%;
-        }
-        .lc-desktop {
-            width: 25%;
-        }
-        #map {
-            width: 74%;
         }
     }
     .lc_hr {
