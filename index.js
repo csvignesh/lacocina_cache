@@ -3,6 +3,7 @@
 const express = require('express');
 const app = express();
 const yelpClient = require('./yelpClient');
+const yelpCrawler = require('./yelpImageCrawler');
 const gSheetClient = require('./gSheet-client');
 
 app.set('port', (process.env.PORT || 8080));
@@ -16,9 +17,13 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get('/', async (req, res) => {
+app.get('/with', async (req, res) => {
     const data = await (yelpClient.getDataFor(req.query.id));
     res.send(data);
+});
+
+app.get('/photos', async (req, res) => {
+    res.send(yelpCrawler.getPhotos(req.query.id) || []);
 });
 
 app.get('/all', async (req, res) => {
@@ -43,6 +48,7 @@ app.listen(app.get('port'), () => {
 const warmUpCache = async () => {
     console.log("Warming up - yelp data");
     const places = await (gSheetClient.getSheetData());
+    console.log(`Got ${places.length} to warm up`);
     for (const place of places) {
         try {
             const data = await yelpClient.getDataFor(place.id);
@@ -54,4 +60,8 @@ const warmUpCache = async () => {
         }
     };
     console.log(`warmed up - ${places.length}`);
+    // trigger photo crawl
+    places.forEach(place => {
+        yelpCrawler.crawl(place.id);
+    });
 };

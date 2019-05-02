@@ -16,22 +16,26 @@ module.exports = {
     getSheetData: async (id = '1y6JNHNmoZrOzBgH7cnsuJwETzTj4Myq1rnHCjSQiXl4') => {
         const auth = getAuth();
         const sheets = google.sheets({version: 'v4', auth});
-        const response = await (util.promisify(sheets.spreadsheets.values.get)({
-            spreadsheetId: id,
-            range: 'A1:B100'
-        }));
+        try {
+            const response = await (util.promisify(sheets.spreadsheets.values.get.bind(sheets))({
+                spreadsheetId: id,
+                range: 'A1:B100'
+            }));
 
-        if (response.data.values.length) {
-            // give out only first column data which is not empty
-            return response.data.values.map(e => {
-                return {
-                    id: e[0],
-                    pinType: (e[1] || "").toLowerCase().trim().split(" ").join("_")
-                }
-            }).filter(e => !!e.id);
-        } else {
-            console.log('No data found.');
-            return [];
+            if (response.data.values.length) {
+                // give out only first column data which is not empty
+                return response.data.values.map(e => {
+                    return {
+                        id: e[0],
+                        pinType: (e[1] || "").toLowerCase().trim().split(" ").join("_")
+                    }
+                }).filter(e => !!e.id);
+            } else {
+                console.log('No data found.');
+                return [];
+            }
+        } catch(e) {
+            console.error(e);
         }
     }
 };
