@@ -503,8 +503,8 @@
         $('.lc_hr').hide();
         let html = photoGrid.replace('$title', poi.name);
         let rows = [];
-        for(var i=0; i<(poi.photos || []).length; i+=3) {
-            rows.push(`<tr><td lcindex=${i} style="background-image: url(${poi.photos[i]});"></td><td lcindex=${i+1} style="background-image: url(${poi.photos[i+1] || ''});"></td><td lcindex=${i+2} style="background-image: url(${poi.photos[i+2] || ''});"></td></tr>`);
+        for(var i=0; i<(poi.allPhotos || []).length; i+=3) {
+            rows.push(`<tr><td lcindex=${i} style="background-image: url(${poi.allPhotos[i]});"></td><td lcindex=${i+1} style="background-image: url(${poi.allPhotos[i+1] || ''});"></td><td lcindex=${i+2} style="background-image: url(${poi.allPhotos[i+2] || ''});"></td></tr>`);
         }
         html = html.replace('$imageRows', rows.join(''));
         $('.lc_poi_slides').html(html);
@@ -519,12 +519,12 @@
                 $('.lc_overlay').css('background-image', `url(${img})`);
                 $('.lc_overlay').css('width', '100%');
                 $('.lc_left_arrow').click(() => {
-                    currentIndex = (currentIndex - 1) < 0 ? poi.photos.length - 1 : currentIndex - 1;
-                    $('.lc_overlay').css('background-image', `url(${poi.photos[currentIndex]})`);
+                    currentIndex = (currentIndex - 1) < 0 ? poi.allPhotos.length - 1 : currentIndex - 1;
+                    $('.lc_overlay').css('background-image', `url(${poi.allPhotos[currentIndex]})`);
                 });
                 $('.lc_right_arrow').click(() => {
-                    currentIndex = (currentIndex + 1) >= poi.photos.length ? 0 : currentIndex + 1;
-                    $('.lc_overlay').css('background-image', `url(${poi.photos[currentIndex]})`);
+                    currentIndex = (currentIndex + 1) >= poi.allPhotos.length ? 0 : currentIndex + 1;
+                    $('.lc_overlay').css('background-image', `url(${poi.allPhotos[currentIndex]})`);
                 });
             }
         });
