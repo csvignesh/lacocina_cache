@@ -28,7 +28,7 @@ module.exports = {
             console.log(`YELP ERROR while fetching photos main page ${id} : ${data.error.code}`);
         } else {
             const $ = cheerio.load(data.body);
-            const count = $('[data-media-tab-label="all"]').attr('data-media-count');
+            const count = $('ul[data-media-count]').attr('data-media-count');
             const photosPerPage = $('li[data-photo-id]').length;
             const numberOfPagesToCrawl = Math.ceil(count/photosPerPage);
             let pagesToCrawl = [];
