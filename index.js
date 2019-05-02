@@ -32,7 +32,7 @@ app.get('/all', async (req, res) => {
         return new Promise(async (resolve) => {
             const details = await (yelpClient.getDataFor(place.id));
             details.pinType = place.pinType;
-            details.allPhotos = yelpCrawler.getPhotos(req.query.id) || [];
+            details.allPhotos = yelpCrawler.getPhotos(place.id) || [];
             resolve(details)
         });
     })).catch(error => {
