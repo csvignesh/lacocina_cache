@@ -336,10 +336,11 @@
         height: 150px;
         float: left;
         margin: 0 12px 12px 0;
+        transition: 0.5s;
     }
 
     .lc_images_grid img {
-        max-width: 100%;
+        /*max-width: 100%;*/
         max-height: 100%;
     }
 
@@ -509,7 +510,7 @@
         let html = photoGrid.replace('$title', poi.name);
         let rows = [];
         (poi.allPhotos || []).forEach((imgUrl, index) => {
-            rows.push(`<li><img src="${imgUrl}" lcindex=${index} /></li>`);
+            rows.push(`<li><img src="${imgUrl}" lcindex=${index} height="226" width="226" /></li>`);
         });
         html = html.replace('$imageRows', rows.join(''));
         $('.lc_poi_slides').html(html);
