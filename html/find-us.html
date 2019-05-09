@@ -430,13 +430,13 @@
 
     .lc_collapsible::after {
         margin-left: 10px;
-        content: '\002B';
+        content: '\25be';
         color: grey;
     }
 
     .lc_active::after {
         margin-left: 10px;
-        content: "\2212";
+        content: "\25B4";
     }
 
     .lc_hours_open {
@@ -454,8 +454,9 @@
 
     .lc_hours_open li {
         list-style: none;
-        width: 200px;
+        width: 240px;
         clear: both;
+        line-height: 20px;
     }
 
     .lc_hours_open ul {
@@ -471,6 +472,7 @@
         float: right;
     }
 </style>
+
 <div class="map-container">
     <div class="slides-pane lc-desktop"></div>
     <div id="map"></div>
@@ -536,7 +538,7 @@
         let html = poiDetailedTemplate.replace('$1', poi.name);
         html = html.replace('$2', poi.categories.map(e => e.title).join(" &#183; "));
         html = html.replace('$3', poi.location.display_address.join("<br>"));
-        html = html.replace('$openhours', generateOpenHoursDOM(poi.hours[0]));
+        html = html.replace('$openhours', poi.hours ? generateOpenHoursDOM(poi.hours[0]) : '');
         html = html.replace('$4', poi.display_phone);
         html = html.replace('$5', poi.writeUp || "Write up goes here");
         html = html.replace('$yelplink', poi.url);
@@ -625,21 +627,53 @@
         const today = date.getDay();
         const currentTime = parseInt(`${date.getHours()}${date.getMinutes()}`);
         const yelpToday = hours.open.find(e => e.day === today);
+        // all days open hours
+        let openDays = [];
+        hours.open.map(e => {
+            if (openDays.indexOf(e.day) === -1) {
+                openDays.push(e.day);
+            }
+        });
+        const openHours = openDays.map(day => {
+            const openHours = hours.open.filter(e => e.day === day);
+            hoursString = openHours.map(e => `${formatTime(e.start)} - ${formatTime(e.end)}`).join("<br>");
+            return {
+                day,
+                openHours,
+                hoursString: hoursString
+            };
+        });
+
         let status = "Closed today";
-        if (today && yelpToday && (currentTime > parseInt(yelpToday.start) && currentTime < parseInt(yelpToday.end))) {
-            // open
-            status = `Open now &#183; Closes at ${formatTime(yelpToday.end)}`;
+        if (today && yelpToday) {
+            // open today
+            let yelpTodayOpenHours = openHours.find(e => e.day === today).openHours;
+            let open = false;
+            let closestOpenTimeDiff = 999999;
+            let closestOpen;
+            yelpTodayOpenHours.forEach(e => {
+               if(!open) {
+                   if ((currentTime > parseInt(e.start) && currentTime < parseInt(e.end))) {
+                       open = true;
+                   } else {
+                       const diff = (parseInt(e.start) - currentTime);
+                       if (diff > 0 && diff < closestOpenTimeDiff) {
+                           closestOpenTimeDiff = diff;
+                           closestOpen = formatTime(e.start);
+                       }
+                   }
+               }
+            });
+            if (open) {
+                status = `Open now &#183; Closes at ${formatTime(yelpTodayOpenHours[yelpTodayOpenHours.length - 1].end)}`;
+            } else {
+                status = `Closed now &#183; Opens at ${closestOpen}`;
+            }
         }
 
-        // all days open hours
-        const openHours = hours.open.map(e => {
-           return {
-               day: days[e.day],
-               hours: `${formatTime(e.start)} - ${formatTime(e.end)}`
-           };
-        });
+
         const openHoursDom = openHours.map(e => {
-           return `<li><span class="lc_hours_open_day">${e.day}</span><span class="lc_hours_open_time">${e.hours}</span></li>`;
+           return `<li><span class="lc_hours_open_day">${days[e.day]}</span><span class="lc_hours_open_time">${e.hoursString}</span></li>`;
         });
 
         hoursDOM = hoursDOM.replace('$status', status);
@@ -702,7 +736,7 @@
     $(function() {
         $.ajax({
             url: `https://lacocinacache.herokuapp.com/all?r=${Math.random()}`,
-            timeout: 2000,
+            timeout: 12500,
             retryLimit: 3
         }).done(data => {
             locations = data;
