@@ -42,11 +42,12 @@ app.get('/all', async (req, res) => {
 });
 
 app.listen(app.get('port'), () => {
+    const refreshHoursInMS = (yelpClient.cacheOutDateTimeInHours * 60 * 60 * 1000) + 2000;
     console.log("Node app is running at localhost:" + app.get('port'));
     warmUpCache();
-    // setInterval(() => {
-    //     warmUpCache();
-    // }, yelpClient.cacheOutDateTime + 1000);
+    setInterval(() => {
+        warmUpCache();
+    },  refreshHoursInMS);
 });
 
 const warmUpCache = async () => {
