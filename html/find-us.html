@@ -47,6 +47,7 @@
         overflow: scroll;
     }
     .map-container {
+        font-family: Knockout48;
         margin: 0;
         height: 600px;
         width: 100%;
@@ -104,7 +105,6 @@
     }
 
     table.lc_data {
-        font-family: Helvetica;
         line-height: normal;
         margin: 10px 0;
         margin-bottom: 40px;
@@ -130,7 +130,9 @@
     }
 
     div.lc_poi_title {
-        font-size: 20px;
+        font-size: 22px;
+        letter-spacing: 1px;
+        color: #151e27;
     }
 
     td.lc_poi_details {
@@ -144,9 +146,10 @@
 
     div.lc_poi_type,
     div.lc_poi_address {
-        font-size: 12px;
-        color: grey;
-        font-weight: normal;
+        font-size: 15px;
+        color: #141E27;
+        letter-spacing: normal;
+        font-family: SuperiorText;
     }
     div.lc-drag {
         padding: 10px 0 12px 0;
@@ -169,7 +172,6 @@
     }
 
     .lc_back_to_list {
-        font-family: Knockout-48Featherweight;
         font-size: 16px;
         padding: 5px 5px;
         font-weight: 100;
@@ -184,8 +186,9 @@
     }
 
     .lc_poi_contact {
-        color: #59223c;
-        font-size: 12px;
+        color: #59213b;
+        font-size: 14px;
+        font-family: SuperiorText;
     }
 
     .lc_poi_write_up {
@@ -251,6 +254,7 @@
         overflow: hidden;
         outline:none;
         font-size: 14px;
+        font-family: SFUIText;
     }
 
     /* end detailed view */
@@ -268,9 +272,10 @@
         padding: 8px 10px;
         border-radius: 3px;
         margin-right: 12px;
-        font-size: 14px;
+        font-size: 18px;
         cursor: pointer;
         background-color: white;
+        letter-spacing: 0.8px;
     }
 
     .lc_filter.selected {
@@ -446,10 +451,12 @@
     }
 
     .lc_hours {
-        font-size: 12px;
-        color: grey;
         font-weight: normal;
         margin-left: 32px;
+        font-size: 15px;
+        color: #141E27;
+        letter-spacing: normal;
+        font-family: SuperiorText;
     }
 
     .lc_hours_open li {
@@ -466,6 +473,10 @@
 
     .lc_hours_open_day {
         float: left;
+    }
+
+    .lc_hours_open_day_bold {
+        font-weight: bold;
     }
 
     .lc_hours_open_time {
@@ -491,11 +502,11 @@
     let locations = [];
     let currentFilters = [];
     const cuisineFilter = '<div class="lc_detailed_filter"> <div class="lc_detailed_filter_cuisine">Cuisine</div><table class="lc_df_cuisine_entries">$rows</table></div>';
-    const filtersAndBaseDOM = '<div class="lc-slides-and-filters"><hr class="lc_hr"><div class="slides-pane-content"> <div class="lc_filters"> <div class="lc_filter" pinType="restaurant">Restaurants</div><div class="lc_filter" pinType="shared_production_facility">Products</div><div class="lc_filter" data-type="cuisine">Cuisine <div class="arrow-down"></div></div></div><div class="lc_poi_slides"></div></div></div>';
+    const filtersAndBaseDOM = '<div class="lc-slides-and-filters"><hr class="lc_hr"><div class="slides-pane-content"> <div class="lc_filters"> <div class="lc_filter" pinType="restaurant">RESTAURANTS</div><div class="lc_filter" pinType="shared_production_facility">PRODUCTS</div><div class="lc_filter" data-type="cuisine">CUISINE <div class="arrow-down"></div></div></div><div class="lc_poi_slides"></div></div></div>';
     const restaurantPinURL = 'https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cc6196124a694497454eebb/1556486497277/pin.png';
     const otherPinURL = 'https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cc7eff9ee6eb06c45420380/1556606969107/OrangePin.png';
     const poiTemplate = `<div><table class="lc_data $0"><tr> <td> <img class="lc_poi_icon" src="$pinUrl"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">$1</div><div class="lc_detail lc_poi_type">$2</div><div class="lc_detail lc_poi_address">$3</div></td></tr></table></div>`;
-    const poiDetailedTemplate = `<div> <div class="lc_back_to_list">back to list</div><table class="lc_data lc_data_details"> <tr> <td> <img class="lc_poi_icon" src="$pinUrl"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">$1</div><div class="lc_detail lc_poi_type">$2</div><div class="lc_detail lc_poi_address">$3</div></td></tr></table>$openhours<div class="lc_poi_contact"> <img class="lc_poi_phone" src="https://static.thenounproject.com/png/56382-200.png"/>$4</div><p class="lc_poi_write_up"> $5</p><div class="lc_poi_links"><a class="lc_poi_google_map" href="#">OPEN IN GOOGLE MAPS</a> <a class="lc_poi_yelp" href="$yelplink" target="_blank">OPEN IN YELP</a></div> <div class="lc_poi_photos"> <img class="lc_poi_photos_primary" src="$6"/> <div class="lc_poi_photos_secondary_container"> <img class="lc_poi_photos_secondary" src="$7"/> <button class="lc_poi_photos_secondary_all_photos">All photos</button></div></div></div>`;
+    const poiDetailedTemplate = `<div> <div class="lc_back_to_list">back to list</div><table class="lc_data lc_data_details"> <tr> <td> <img class="lc_poi_icon" src="$pinUrl"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">$1</div><div class="lc_detail lc_poi_type">$2</div><div class="lc_detail lc_poi_address">$3</div></td></tr></table>$openhours$contact$writeup<div class="lc_poi_links"><a class="lc_poi_google_map" href="#">OPEN IN GOOGLE MAPS</a> <a class="lc_poi_yelp" href="$yelplink" target="_blank">OPEN IN YELP</a></div> <div class="lc_poi_photos"> <img class="lc_poi_photos_primary" src="$6"/> <div class="lc_poi_photos_secondary_container"> <img class="lc_poi_photos_secondary" src="$7"/> <button class="lc_poi_photos_secondary_all_photos">All photos</button></div></div></div>`;
     const photoGrid = '<div class="lc_images"> <div class="lc_images_back_banner"> <div class="lc_images_back_banner_text"> $title </div></div><ul class="lc_images_grid">$imageRows</ul></div>';
     const overlay = '<div class="lc_overlay"> <a href="#" class="lc_overlay_closebtn">&times;</a><div class="lc_left_arrow"></div><div class="lc_right_arrow"></div></div>';
 
@@ -535,12 +546,14 @@
         }
     };
     const setupPoiDetailedSlide = (poi) => {
+        const contact = `<div class="lc_poi_contact"><img class="lc_poi_phone" src="https://static.thenounproject.com/png/56382-200.png"/>$phone</div>`;
+        const writeup = `<p class="lc_poi_write_up">$text</p>`;
         let html = poiDetailedTemplate.replace('$1', poi.name);
         html = html.replace('$2', poi.categories.map(e => e.title).join(" &#183; "));
         html = html.replace('$3', poi.location.display_address.join("<br>"));
         html = html.replace('$openhours', poi.hours ? generateOpenHoursDOM(poi.hours[0]) : '');
-        html = html.replace('$4', poi.display_phone);
-        html = html.replace('$5', poi.writeUp || "Write up goes here");
+        html = html.replace('$contact', poi.display_phone ? contact.replace("$phone", poi.display_phone) : '');
+        html = html.replace('$writeup', poi.writeUp ? writeup.replace("$text", poi.writeUp) : '');
         html = html.replace('$yelplink', poi.url);
         html = html.replace('$6', poi.photos[0]);
         html = html.replace('$7', poi.photos[1]);
@@ -650,7 +663,7 @@
             let yelpTodayOpenHours = openHours.find(e => e.day === today).openHours;
             let open = false;
             let closestOpenTimeDiff = 999999;
-            let closestOpen;
+            let closestOpen = '';
             yelpTodayOpenHours.forEach(e => {
                if(!open) {
                    if ((currentTime > parseInt(e.start) && currentTime < parseInt(e.end))) {
@@ -670,10 +683,27 @@
                 status = `Closed now &#183; Opens at ${closestOpen}`;
             }
         }
+        let orderedHoursBasedOnCurrentDate = [];
+        const checkAndAddData = (day) => {
+            const data = openHours.find(e => e.day === day);
+            if(data) {
+                orderedHoursBasedOnCurrentDate.push(data);
+            }
+        };
+        // current to end of week
+        for(let i = today; i < 7; i++) {
+            checkAndAddData(i);
+        }
+        // start to current
+        if (today > 0) {
+            for(let i = 0; i < today; i++) {
+                checkAndAddData(i);
+            }
+        }
 
 
-        const openHoursDom = openHours.map(e => {
-           return `<li><span class="lc_hours_open_day">${days[e.day]}</span><span class="lc_hours_open_time">${e.hoursString}</span></li>`;
+        const openHoursDom = orderedHoursBasedOnCurrentDate.map(e => {
+           return `<li><span class="lc_hours_open_day ${e.day === today ? "lc_hours_open_day_bold" : ""}">${days[e.day]}</span><span class="lc_hours_open_time ${e.day === today ? "lc_hours_open_day_bold" : ""}">${e.hoursString}</span></li>`;
         });
 
         hoursDOM = hoursDOM.replace('$status', status);
