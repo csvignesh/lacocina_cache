@@ -5,17 +5,17 @@ const util = require('util');
 const appUtils = require('./lacocina-utils');
 const cache = {};
 const yelpApiKey = 'LHmAorCggtmQbxWdPB-T-4tnh2VGSYkn4zWoMbBiJPFOeAsQqpDGWtbsdhNPJv7bs4yBJ8L8UIyBasdBKkKl5dxVq9MNHUd_zFOXp3jg4vLihxJ3PbKHKa8rwKSDXHYx';
-const cacheOutDateTimeInHours = 5;
+const cacheOutDateTimeInHours = 2;
 
 module.exports = {
     cacheOutDateTimeInHours: cacheOutDateTimeInHours,
-    getDataFor: async(id) => {
+    getDataFor: async(id, force) => {
         if (!id) {
             return {'err': 'id missing'}
         }
 
         // return is available in cache and less than 5 hrs of cache time
-        if (cache[id] && (Math.abs(Date.now() - cache[id].ts) / 36e5) < cacheOutDateTimeInHours) {
+        if (!force && cache[id] && (Math.abs(Date.now() - cache[id].ts) / 36e5) < cacheOutDateTimeInHours) {
             return cache[id];
         }
 

@@ -56,7 +56,7 @@ const warmUpCache = async () => {
     console.log(`Got ${places.length} to warm up`);
     for (const place of places) {
         try {
-            const data = await yelpClient.getDataFor(place.id);
+            const data = await yelpClient.getDataFor(place.id, true);
             if(!data.id) {
                 console.error(`Error fetching ${place.id}`);
             }
