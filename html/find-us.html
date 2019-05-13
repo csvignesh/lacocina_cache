@@ -680,7 +680,12 @@
             if (open) {
                 status = `Open now &#183; Closes at ${formatTime(yelpTodayOpenHours[yelpTodayOpenHours.length - 1].end)}`;
             } else {
-                status = `Closed now &#183; Opens at ${closestOpen}`;
+                if(closestOpen) {
+                    status = `Closed now &#183; Opens at ${closestOpen}`;
+                } else {
+                    status = `Closed now`;
+                }
+
             }
         }
         let orderedHoursBasedOnCurrentDate = [];
