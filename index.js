@@ -31,9 +31,11 @@ app.get('/all', async (req, res) => {
     const data = await Promise.all(places.map(place => {
         return new Promise(async (resolve) => {
             const details = await (yelpClient.getDataFor(place.id));
-            details.pinType = place.pinType;
-            details.allPhotos = yelpCrawler.getPhotos(place.id) || [];
-            resolve(details)
+            if(details) {
+                details.pinType = place.pinType;
+                details.allPhotos = yelpCrawler.getPhotos(place.id) || [];
+            }
+            resolve(details);
         });
     })).catch(error => {
         console.log(error.message);

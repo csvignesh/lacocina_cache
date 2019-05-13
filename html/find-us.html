@@ -769,7 +769,7 @@
             timeout: 12500,
             retryLimit: 3
         }).done(data => {
-            locations = data;
+            locations = data.filter(e => e !== undefined);
 
             setupDeviceRelatedDOM();
             setupMarkers(data);
