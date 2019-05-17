@@ -726,7 +726,23 @@
             },
             streetViewControl: false,
             mapTypeControl: false,
-            gestureHandling: 'greedy'
+            gestureHandling: 'cooperative',
+            fullscreenControl: false,
+            zoomControl: false
+        });
+
+        map.setOptions({
+            styles: [
+                {
+                    featureType: 'poi.business',
+                    stylers: [{visibility: 'off'}]
+                },
+                {
+                    featureType: 'transit',
+                    elementType: 'labels.icon',
+                    stylers: [{visibility: 'off'}]
+                }
+            ]
         });
     }
 
