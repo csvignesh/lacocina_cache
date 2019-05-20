@@ -5,7 +5,7 @@ const util = require('util');
 const appUtils = require('./lacocina-utils');
 const cache = {};
 const yelpApiKey = 'LHmAorCggtmQbxWdPB-T-4tnh2VGSYkn4zWoMbBiJPFOeAsQqpDGWtbsdhNPJv7bs4yBJ8L8UIyBasdBKkKl5dxVq9MNHUd_zFOXp3jg4vLihxJ3PbKHKa8rwKSDXHYx';
-const cacheOutDateTimeInHours = 2;
+const cacheOutDateTimeInHours = 0.0333333;
 
 module.exports = {
     cacheOutDateTimeInHours: cacheOutDateTimeInHours,
