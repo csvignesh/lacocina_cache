@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 });
 
 // heroku sleeps app if no traffic - so we ping from http://kaffeine.herokuapp.com/ every 30 mins
-app.get('/ping', () => {
+app.get('/', (req, res) => {
     res.send({
         success: 1
     });
