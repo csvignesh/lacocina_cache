@@ -9,7 +9,7 @@ exports.config = {
   /**
    * Array of application names.
    */
-  app_name: ['My Application'],
+  app_name: ['lacocina_cache'],
   /**
    * Your New Relic license key.
    */
