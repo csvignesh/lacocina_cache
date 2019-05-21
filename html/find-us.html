@@ -297,6 +297,9 @@
         cursor: pointer;
         background-color: white;
         letter-spacing: 0.8px;
+    }
+
+    .lc_filter_pin {
         background-repeat: no-repeat;
         padding-left: 25px;
         background-size: 20px 28px;
@@ -537,7 +540,7 @@
     let locations = [];
     let currentFilters = [];
     const cuisineFilter = '<div class="lc_detailed_filter"> <div class="lc_detailed_filter_cuisine">Cuisine</div><table class="lc_df_cuisine_entries">$rows</table></div>';
-    const filtersAndBaseDOM = '<div class="lc-slides-and-filters"><hr class="lc_hr"><div class="slides-pane-content"> <div class="lc_filters"> <div class="lc_filter restaurant" pinType="restaurant">RESTAURANTS</div><div class="lc_filter product" pinType="shared_production_facility">PRODUCTS</div><div class="lc_filter" data-type="cuisine">CUISINE <div class="arrow-down"></div></div></div><div class="lc_poi_slides"></div></div></div>';
+    const filtersAndBaseDOM = '<div class="lc-slides-and-filters"><hr class="lc_hr"><div class="slides-pane-content"> <div class="lc_filters"> <div class="lc_filter lc_filter_pin restaurant" pinType="restaurant">RESTAURANTS</div><div class="lc_filter lc_filter_pin product" pinType="shared_production_facility">PRODUCTS</div><div class="lc_filter" data-type="category">CATEGORY <div class="arrow-down"></div></div></div><div class="lc_poi_slides"></div></div></div>';
     const restaurantPinURL = 'https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cc6196124a694497454eebb/1556486497277/pin.png';
     const otherPinURL = 'https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cc7eff9ee6eb06c45420380/1556606969107/OrangePin.png';
     const poiTemplate = `<div><table class="lc_data $0"><tr> <td> <img class="lc_poi_icon" src="$pinUrl"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">$1</div><div class="lc_detail lc_poi_type">$2</div><div class="lc_detail lc_poi_address">$3</div></td></tr></table></div>`;
@@ -835,7 +838,7 @@
             setupOverlay();
 
             $('.lc_filter').click(function() {
-                if ($(this).attr("data-type") == "cuisine") {
+                if ($(this).attr("data-type") == "category") {
                     createDetailedFilter();
                     return;
                 }
