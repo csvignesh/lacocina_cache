@@ -44,7 +44,7 @@ module.exports = {
 
                    const $ = cheerio.load(data.body);
                    const images = $('li[data-photo-id]').map((i, el) => {
-                       return `https://s3-media2.fl.yelpcdn.com/bphoto/${el.attribs['data-photo-id']}/o.jpg`;
+                       return el.attribs['data-photo-id'];
                    }).get();
 
                    resolve(images);

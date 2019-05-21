@@ -582,8 +582,10 @@
         $('.lc_hr').hide();
         let html = photoGrid.replace('$title', poi.name);
         let rows = [];
-        (poi.allPhotos || []).forEach((imgUrl, index) => {
-            rows.push(`<li><img src="${imgUrl}" lcindex=${index} height="226" width="226" /></li>`);
+        (poi.allPhotos || []).forEach((imgId, index) => {
+            const src = `https://s3-media2.fl.yelpcdn.com/bphoto/${imgId}/o.jpg`;
+            const srcSet = `https://s3-media2.fl.yelpcdn.com/bphoto/${imgId}/300s.jpg 1.16x,https://s3-media2.fl.yelpcdn.com/bphoto/${imgId}/348s.jpg 1.35x`;
+            rows.push(`<li><img src="${src}" srcset="${srcSet}" lcindex=${index} height="226" width="226" /></li>`);
         });
         html = html.replace('$imageRows', rows.join(''));
         $('.lc_poi_slides').html(html);
