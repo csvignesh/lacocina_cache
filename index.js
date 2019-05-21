@@ -1,6 +1,5 @@
 'use strict';
 
-require('newrelic');
 const express = require('express');
 const app = express();
 const yelpClient = require('./yelpClient');
@@ -16,6 +15,13 @@ app.use((req, res, next) => {
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header("Cache-Control", "no-cache");
     next();
+});
+
+// heroku sleeps app if no traffic - so we ping from http://kaffeine.herokuapp.com/ every 30 mins
+app.get('/ping', () => {
+    res.send({
+        success: 1
+    });
 });
 
 app.get('/with', async (req, res) => {

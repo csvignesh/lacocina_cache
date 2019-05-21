@@ -13,7 +13,6 @@
     "request": "latest",
     "express": "latest",
     "googleapis": "latest",
-    "cheerio": "latest",
-    "newrelic": "latest"
+    "cheerio": "latest"
   }
 }
