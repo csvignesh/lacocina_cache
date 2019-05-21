@@ -1,4 +1,8 @@
 <style>
+    * {
+        -webkit-overflow-scrolling: touch;
+    }
+
     section.Main-content {
         max-width: none !important;
     }
@@ -34,9 +38,26 @@
             padding: 0 10px;
         }
         ul.lc_images_grid > li {
-            width: 100px !important;
-            height: 100px !important;
-            margin: 0 6px 6px 0;
+            margin: 0 20px 10px 0 !important;
+        }
+        ul.lc_images_grid{
+            padding-inline-start: 40px !important;
+        }
+    }
+    @media only screen and (max-width: 400px) {
+        ul.lc_images_grid{
+            padding-inline-start: 18px !important;
+        }
+    }
+
+    @media only screen and (max-width: 365px) {
+        ul.lc_images_grid > li {
+            width: 125px !important;
+            height: 125px !important;
+        }
+
+        ul.lc_images_grid{
+            padding-inline-start: 14px !important;
         }
     }
     .slides-pane.lc-desktop{
@@ -335,10 +356,11 @@
     }
 
     ul.lc_images_grid {
-        padding: 0 10px;
+        margin: 0 auto;
         width: 100%;
         margin-top: 10px;
         list-style: none;
+        padding-inline-start: 20px;
     }
 
     ul.lc_images_grid > li {
@@ -481,6 +503,7 @@
 
     .lc_hours_open_time {
         float: right;
+        text-align: right;
     }
 </style>
 
@@ -601,11 +624,11 @@
                 $('.lc_overlay').css('width', '100%');
                 $('.lc_left_arrow').click(function() {
                     currentIndex = (currentIndex - 1) < 0 ? poi.allPhotos.length - 1 : currentIndex - 1;
-                    $('.lc_overlay').css('background-image', `url(${poi.allPhotos[currentIndex]})`);
+                    $('.lc_overlay').css('background-image', `url(https://s3-media2.fl.yelpcdn.com/bphoto/${poi.allPhotos[currentIndex]}/o.jpg)`);
                 });
                 $('.lc_right_arrow').click(function() {
                     currentIndex = (currentIndex + 1) >= poi.allPhotos.length ? 0 : currentIndex + 1;
-                    $('.lc_overlay').css('background-image', `url(${poi.allPhotos[currentIndex]})`);
+                    $('.lc_overlay').css('background-image', `url(https://s3-media2.fl.yelpcdn.com/bphoto/${poi.allPhotos[currentIndex]}/o.jpg)`);
                 });
             }
         });
