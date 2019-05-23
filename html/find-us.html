@@ -539,6 +539,8 @@
     let isMobile = false;
     let locations = [];
     let currentFilters = [];
+    let zoomListerner = undefined;
+    let markerIconBasedOnZoom = {};
     const cuisineFilter = '<div class="lc_detailed_filter"> <div class="lc_detailed_filter_cuisine">Cuisine</div><table class="lc_df_cuisine_entries">$rows</table></div>';
     const filtersAndBaseDOM = '<div class="lc-slides-and-filters"><hr class="lc_hr"><div class="slides-pane-content"> <div class="lc_filters"> <div class="lc_filter lc_filter_pin restaurant" pinType="restaurant">RESTAURANTS</div><div class="lc_filter lc_filter_pin product" pinType="shared_production_facility">PRODUCTS</div><div class="lc_filter" data-type="category">CATEGORY <div class="arrow-down"></div></div></div><div class="lc_poi_slides"></div></div></div>';
     const restaurantPinURL = 'https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cc6196124a694497454eebb/1556486497277/pin.png';
@@ -648,7 +650,9 @@
             }
         });
     };
+    const getZoomBasedIcon = () => (map.getZoom() >= 1 && map.getZoom() >= 17) ? markerIconBasedOnZoom[17] : markerIconBasedOnZoom[1];
     const setupMarkers = (locations) => {
+        const zoomBasedIcon = getZoomBasedIcon();
         for (var location of locations) {
             const pinUrl = location.pinType == 'restaurant' ? restaurantPinURL : otherPinURL;
             let marker = new google.maps.Marker({
@@ -659,7 +663,12 @@
                 map: map,
                 animation: google.maps.Animation.DROP,
                 title: location.name,
-                icon: pinUrl
+                icon: {
+                    url: pinUrl,
+                    scaledSize: zoomBasedIcon.scaledSize,
+                    origin: zoomBasedIcon.origin,
+                    anchor: zoomBasedIcon.anchor
+                }
             });
             const poiData = location;
             marker.addListener('click', () => {
@@ -796,7 +805,15 @@
         }
     }
 
-    function setupDeviceRelatedDOM() {
+    function oneTimeSetup() {
+        markerIconBasedOnZoom = {
+            1: {
+                scaledSize: new google.maps.Size(17, 22), // scaled size
+                origin: new google.maps.Point(0,0), // origin
+                anchor: new google.maps.Point(0, 0) // anchor
+            },
+            17: {}
+        };
         const $desktop = $('.lc-desktop');
         const $mobile = $('.lc-mobile');
         if (screen.width > 640) {
@@ -824,6 +841,20 @@
         return `${hrs}${mins !== '00' ? `:${mins}` : ''} ${noon}`;
     }
 
+    function setupZoomListener(locations) {
+        map.addListener('zoom_changed', function() {
+            const zoomBasedIcon = getZoomBasedIcon();
+            for (var location of locations) {
+                location.marker.setIcon({
+                    url: location.marker.getIcon().url,
+                    scaledSize: zoomBasedIcon.scaledSize,
+                    origin: zoomBasedIcon.origin,
+                    anchor: zoomBasedIcon.anchor
+                });
+            }
+        });
+    }
+
     $(function() {
         $.ajax({
             url: `https://lacocinacache.herokuapp.com/all?r=${Math.random()}`,
@@ -832,8 +863,9 @@
         }).done(data => {
             locations = data.filter(e => e !== undefined);
 
-            setupDeviceRelatedDOM();
+            oneTimeSetup();
             setupMarkers(data);
+            setupZoomListener(data);
             setupPoiSlides(data);
             setupOverlay();
 
