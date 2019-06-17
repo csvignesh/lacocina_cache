@@ -889,12 +889,12 @@
             timeout: 12500,
             retryLimit: 3
         }).done(data => {
-            locations = data.filter(e => e !== undefined);
+            locations = data.filter(e => e !== undefined && !e.error);
 
             oneTimeSetup();
-            setupMarkers(data);
-            setupZoomListener(data);
-            setupPoiSlides(data);
+            setupMarkers(locations);
+            setupZoomListener(locations);
+            setupPoiSlides(locations);
             setupOverlay();
 
             $('.lc_filter').click(function() {
