@@ -82,6 +82,15 @@
         #map, .lc-desktop {
             height: 100%;
         }
+        div#map:before {
+            box-shadow: 10px -2px 11px -11px rgba(0,0,0,1) inset;
+            content: "";
+            height: 100%;
+            left: 0;
+            position: absolute;
+            width: 8px;
+            z-index: 1000;
+        }
     }
     .lc_hr {
         height: 10px;
@@ -594,14 +603,14 @@
         return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([location.name, ...location.location.display_address].join(", "))}`;
     }
     const setupPoiDetailedSlide = (poi) => {
-        const contact = `<div class="lc_poi_contact"><img class="lc_poi_phone" src="https://static.thenounproject.com/png/56382-200.png"/>$phone</div>`;
+        const contact = `<div class="lc_poi_contact"><a href="tel:$callLink"><img class="lc_poi_phone" src="https://static.thenounproject.com/png/56382-200.png"/>$phone</a></div>`;
         const writeup = `<p class="lc_poi_write_up">$text</p>`;
         const gMapLocation = createGoogleMapsLink(poi);
         let html = poiDetailedTemplate.replace('$1', poi.name.toUpperCase());
         html = html.replace('$2', poi.categories.map(e => e.title).join(" &#183; "));
         html = html.replace('$3', poi.location.display_address.join("<br>")).replace('$address_glink', gMapLocation);
         html = html.replace('$openhours', poi.hours ? generateOpenHoursDOM(poi.hours[0]) : '');
-        html = html.replace('$contact', poi.display_phone ? contact.replace("$phone", poi.display_phone) : '');
+        html = html.replace('$contact', poi.display_phone ? contact.replace("$phone", poi.display_phone).replace("$callLink", poi.display_phone) : '');
         html = html.replace('$writeup', poi.writeUp ? writeup.replace("$text", poi.writeUp) : '');
         html = html.replace('$yelplink', poi.url);
         html = html.replace('$gLink', gMapLocation);
