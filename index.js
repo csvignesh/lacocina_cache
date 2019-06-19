@@ -35,12 +35,12 @@ app.get('/photos', async (req, res) => {
 
 app.get('/all', async (req, res) => {
     const places = await (gSheetClient.getSheetData());
-    const data = await Promise.all(places.map(place => {
+    const data = await Promise.all(places.map(placeSheetData => {
         return new Promise(async (resolve) => {
-            const details = await (yelpClient.getDataFor(place.id));
+            let details = await (yelpClient.getDataFor(placeSheetData.id));
             if(details) {
-                details.pinType = place.pinType;
-                details.allPhotos = yelpCrawler.getPhotos(place.id) || [];
+                details = Object.assign({}, details, placeSheetData)
+                details.allPhotos = yelpCrawler.getPhotos(placeSheetData.id) || [];
             }
             resolve(details);
         });

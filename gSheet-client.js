@@ -12,6 +12,10 @@ const getAuth = () => {
     return oAuth2Client;
 };
 
+const parseMultiData = (stringData = "") => {
+    return stringData.toLowerCase().split(",").map(e => e.trim().split(" ").join("_"));
+};
+
 module.exports = {
     getSheetData: async (id = '1y6JNHNmoZrOzBgH7cnsuJwETzTj4Myq1rnHCjSQiXl4') => {
         const auth = getAuth();
@@ -19,7 +23,7 @@ module.exports = {
         try {
             const response = await (util.promisify(sheets.spreadsheets.values.get.bind(sheets))({
                 spreadsheetId: id,
-                range: 'A1:B100'
+                range: 'A1:F100'
             }));
 
             if (response.data.values.length) {
@@ -27,7 +31,13 @@ module.exports = {
                 return response.data.values.map(e => {
                     return {
                         id: e[0],
-                        pinType: (e[1] || "").toLowerCase().trim().split(" ").join("_")
+                        pinType: (e[1] || "").toLowerCase().trim().split(" ").join("_"),
+                        businessType: parseMultiData(e[1]),
+                        mealTypes: parseMultiData(e[2]),
+                        cuisine: parseMultiData(e[3]),
+                        writeUp: e[4],
+                        website: e[5]
+
                     }
                 }).filter(e => !!e.id);
             } else {
