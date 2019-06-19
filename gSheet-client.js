@@ -23,7 +23,7 @@ module.exports = {
         try {
             const response = await (util.promisify(sheets.spreadsheets.values.get.bind(sheets))({
                 spreadsheetId: id,
-                range: 'A1:F100'
+                range: 'A2:F100'
             }));
 
             if (response.data.values.length) {
