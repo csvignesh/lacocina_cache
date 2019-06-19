@@ -12,6 +12,10 @@ const getAuth = () => {
     return oAuth2Client;
 };
 
+const parseMultiDataWithActualText = (stringData = "") => {
+    return stringData.split(",").map(e => e.trim());
+};
+
 const parseMultiData = (stringData = "") => {
     return stringData.toLowerCase().split(",").map(e => e.trim().split(" ").join("_"));
 };
@@ -27,8 +31,18 @@ module.exports = {
             }));
 
             if (response.data.values.length) {
-                // give out only first column data which is not empty
-                return response.data.values.map(e => {
+                let meta = {
+                    id: 'meta',
+                    businessTypes: new Set([]),
+                    mealTypes: new Set([]),
+                    cuisines: new Set([])
+                };
+                let data = response.data.values.map(e => {
+                    // add data to meta for filters to be available on client
+                    parseMultiDataWithActualText(e[1]).forEach(e => meta.businessTypes.add(e));
+                    parseMultiDataWithActualText(e[2]).forEach(e => meta.mealTypes.add(e));
+                    parseMultiDataWithActualText(e[3]).forEach(e => meta.cuisines.add(e));
+
                     return {
                         id: e[0],
                         pinType: (e[1] || "").toLowerCase().trim().split(" ").join("_"),
@@ -37,9 +51,15 @@ module.exports = {
                         cuisine: parseMultiData(e[3]),
                         writeUp: e[4],
                         website: e[5]
-
                     }
                 }).filter(e => !!e.id);
+
+                meta.businessTypes = Array.from(meta.businessTypes);
+                meta.mealTypes = Array.from(meta.mealTypes);
+                meta.cuisines = Array.from(meta.cuisines);
+                data.push(meta);
+
+                return data;
             } else {
                 console.log('No data found.');
                 return [];

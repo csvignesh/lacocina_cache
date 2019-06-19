@@ -37,9 +37,12 @@ app.get('/all', async (req, res) => {
     const places = await (gSheetClient.getSheetData());
     const data = await Promise.all(places.map(placeSheetData => {
         return new Promise(async (resolve) => {
+            if (placeSheetData.id === 'meta') {
+                resolve(placeSheetData);
+            }
             let details = await (yelpClient.getDataFor(placeSheetData.id));
             if(details) {
-                details = Object.assign({}, details, placeSheetData)
+                details = Object.assign({}, details, placeSheetData);
                 details.allPhotos = yelpCrawler.getPhotos(placeSheetData.id) || [];
             }
             resolve(details);
@@ -62,8 +65,12 @@ app.listen(app.get('port'), () => {
 const warmUpCache = async () => {
     console.log("Warming up - yelp data");
     const places = await (gSheetClient.getSheetData());
-    console.log(`Got ${places.length} to warm up`);
+    // -1 for meta data
+    console.log(`Got ${places.length - 1} to warm up`);
     for (const place of places) {
+        if (place.id === 'meta') {
+            continue;
+        }
         try {
             const data = await yelpClient.getDataFor(place.id, true);
             if(!data.id) {
@@ -73,9 +80,12 @@ const warmUpCache = async () => {
             console.log(`Exception while fetching ${place.id}`, e)
         }
     };
-    console.log(`warmed up - ${places.length}`);
+    console.log(`warmed up - ${places.length - 1}`);
     // trigger photo crawl
     places.forEach(place => {
+        if (place.id === 'meta') {
+            return;
+        }
         yelpCrawler.crawl(place.id);
     });
 };
