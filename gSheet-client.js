@@ -48,7 +48,7 @@ module.exports = {
                         pinType: (e[1] || "").toLowerCase().trim().split(" ").join("_"),
                         businessType: parseMultiData(e[1]),
                         mealTypes: parseMultiData(e[2]),
-                        cuisine: parseMultiData(e[3]),
+                        cuisines: parseMultiData(e[3]),
                         writeUp: e[4],
                         website: e[5]
                     }

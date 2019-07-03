@@ -553,6 +553,40 @@
         float: right;
         text-align: right;
     }
+
+    .lc_category_filter {
+        clear: both;
+        margin: 0 10px;
+        padding: 0 10px;
+        font-size: 22px;
+        line-height: normal;
+        color: #151e27;
+    }
+
+    .lc_category_filter_list {
+        padding-inline-start: 20px;
+        margin-top: 5px;
+    }
+
+    .lc_category_filter_list li {
+        list-style: none;
+        float: left;
+        padding: 5px 14px;
+        background-color: white;
+        border-radius: 18px;
+        border: solid 2px #59223c;
+        margin: 5px 5px;
+        line-height: normal;
+        font-size: 17px;
+        cursor: pointer;
+    }
+    .lc_category_filter_list li.selected {
+        background-color: #59223c;
+        color: white;
+    }
+    .lc_category_filter_list li:last-child {
+        margin-bottom: 20px;
+    }
 </style>
 
 <div class="map-container">
@@ -591,7 +625,16 @@
             $('.lc_filters').attr('style','display:none !important');
             $('.lc_back_to_list').click(() => {
                 $('.lc_filters').attr('style', '');
-                setupPoiSlides(locations);
+                let filteredLocations = currentFilters.length === 0 ? locations : locations.filter(location => {
+                    let show = false;
+                    currentFilters.forEach(filter => {
+                        if(location[filter.type].indexOf(filter.value) > -1) {
+                            show = true;
+                        }
+                    });
+                });
+                setupMarkers(filteredLocations);
+                setupPoiSlides(filteredLocations);
             });
         }
 
@@ -896,7 +939,56 @@
 
     const createCategoryFilters = () => {
         let html = backToList;
+        let localSelections = currentFilters.map(e => {
+            return {
+                type: e.type,
+                value: e.value
+            };
+        });
+        let filters = {
+            mealTypes: 'MEAL TYPE',
+            cuisines: 'CUISINE',
+            businessTypes: 'BUSINESS TYPE'
+        };
+
+        Object.keys(filters).forEach(type => {
+            let options = metadata[type];
+            if(options === undefined || options.length === 0) {
+                return;
+            }
+
+            let title = `<div class="lc_category_filter">${filters[type]}</div>`;
+            var optionsHtml = ``;
+            options.forEach(option => {
+                optionsHtml += `<li data-filter-type="${type}" data-filter-value="${option}">${option.toUpperCase()}</li>`;
+            });
+            optionsHtml = `<ul class="lc_category_filter_list">${optionsHtml}</ul>`;
+            html+=`${title}${optionsHtml}`
+        });
+        // buttons
+        // let buttonsHtml = `<div class="lc_category_filter_button lc_cancel">Cancel</div><div class="lc_category_filter_button lc_save">Save</div>`;
+        // html+=buttonsHtml;
+
         $('.lc_poi_slides').html(html);
+        $('.lc_category_filter_list li').click(function() {
+            const filterType = $(this).attr("data-filter-type");
+            const filterValue = $(this).attr("data-filter-value").toLowerCase();
+
+            let indexOfFilter = localSelections.indexOf(filter => filter.type === filterType && filter.value === filterValue);
+            if(indexOfFilter > 0) {
+                $(this).removeClass("selected");
+                localSelections = localSelections.filter(e => e.type !== filterType && e.value !== filterValue);
+            } else {
+                $(this).addClass("selected");
+                localSelections.push({
+                    type: filterType,
+                    value: filterValue.trim().split(" ").join("_")
+                });
+            }
+
+            currentFilters = localSelections;
+        });
+
         showFilters(false);
     };
 
