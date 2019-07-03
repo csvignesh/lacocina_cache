@@ -632,9 +632,19 @@
                             show = true;
                         }
                     });
+                    return show;
+                });
+                locations.forEach(location => {
+                    location.marker.setMap(null);
                 });
                 setupMarkers(filteredLocations);
                 setupPoiSlides(filteredLocations);
+                if(filteredLocations.length > 0) {
+                    map.setCenter({
+                        lat: filteredLocations[0].coordinates.latitude,
+                        lng: filteredLocations[0].coordinates.longitude
+                    });
+                }
             });
         }
 
@@ -936,6 +946,7 @@
             }
         });
     }
+    const formatFilterValue = value => value.toLowerCase().trim().split(" ").join("_");
 
     const createCategoryFilters = () => {
         let html = backToList;
@@ -960,7 +971,8 @@
             let title = `<div class="lc_category_filter">${filters[type]}</div>`;
             var optionsHtml = ``;
             options.forEach(option => {
-                optionsHtml += `<li data-filter-type="${type}" data-filter-value="${option}">${option.toUpperCase()}</li>`;
+                const isSelected = currentFilters.filter(filter => filter.type === type && filter.value === formatFilterValue(option)).length > 0;
+                optionsHtml += `<li class="${isSelected ? 'selected' : ''}" data-filter-type="${type}" data-filter-value="${option}">${option.toUpperCase()}</li>`;
             });
             optionsHtml = `<ul class="lc_category_filter_list">${optionsHtml}</ul>`;
             html+=`${title}${optionsHtml}`
@@ -972,17 +984,17 @@
         $('.lc_poi_slides').html(html);
         $('.lc_category_filter_list li').click(function() {
             const filterType = $(this).attr("data-filter-type");
-            const filterValue = $(this).attr("data-filter-value").toLowerCase();
+            const filterValue = formatFilterValue($(this).attr("data-filter-value"));
 
-            let indexOfFilter = localSelections.indexOf(filter => filter.type === filterType && filter.value === filterValue);
-            if(indexOfFilter > 0) {
+            let indexOfFilter = localSelections.findIndex(filter => filter.type === filterType && filter.value === filterValue);
+            if(indexOfFilter >= 0) {
                 $(this).removeClass("selected");
-                localSelections = localSelections.filter(e => e.type !== filterType && e.value !== filterValue);
+                localSelections.splice(indexOfFilter, 1);
             } else {
                 $(this).addClass("selected");
                 localSelections.push({
                     type: filterType,
-                    value: filterValue.trim().split(" ").join("_")
+                    value: filterValue
                 });
             }
 

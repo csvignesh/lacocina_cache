@@ -46,7 +46,7 @@ module.exports = {
                     return {
                         id: e[0],
                         pinType: (e[1] || "").toLowerCase().trim().split(" ").join("_"),
-                        businessType: parseMultiData(e[1]),
+                        businessTypes: parseMultiData(e[1]),
                         mealTypes: parseMultiData(e[2]),
                         cuisines: parseMultiData(e[3]),
                         writeUp: e[4],
