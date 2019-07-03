@@ -907,7 +907,7 @@
             retryLimit: 3
         }).done(data => {
             metadata = data.filter(e => e.id === 'meta')[0];
-            locations = data.filter(e => e !== undefined && !e.error && e.id !== 'meta');
+            locations = data.filter(e => e !== undefined && !e.error && e.id !== 'meta' && e.is_closed === false);
 
             oneTimeSetup();
             setupMarkers(locations);
