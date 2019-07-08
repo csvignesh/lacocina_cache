@@ -12,6 +12,7 @@
   "dependencies": {
     "request": "latest",
     "express": "latest",
-    "googleapis": "latest"
+    "googleapis": "latest",
+    "cheerio": "latest"
   }
 }

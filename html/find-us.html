@@ -1,13 +1,16 @@
 <style>
+    * {
+        -webkit-overflow-scrolling: touch;
+    }
+
     section.Main-content {
         max-width: none !important;
     }
-    #map {
-        width: 100%;
-    }
+
     @media only screen and (max-width: 640px) {
         #map {
             height: calc(100% - 300px);
+            width: 100%;
         }
         .map-container {
             padding-top: 0 !important;
@@ -19,12 +22,10 @@
             padding: 0px 10px 10px 0px !important;
             box-shadow: none !important;
         }
-        .map-container > div {
-            display: block !important;
-        }
         .slides-pane {
             position: absolute;
             scroll-behavior: smooth;
+            width: 100%;
         }
         .lc_filter {
             font-size: 12px !important;
@@ -33,35 +34,63 @@
         .lc_poi_slides {
             margin-top: 0 !important;
         }
+        .lc-slides-and-filters {
+            padding: 0 10px;
+        }
+        ul.lc_images_grid > li {
+            margin: 0 20px 10px 0 !important;
+        }
+        ul.lc_images_grid{
+            padding-inline-start: 40px !important;
+        }
+    }
+    @media only screen and (max-width: 400px) {
+        ul.lc_images_grid{
+            padding-inline-start: 18px !important;
+        }
+    }
+
+    @media only screen and (max-width: 365px) {
+        ul.lc_images_grid > li {
+            width: 125px !important;
+            height: 125px !important;
+        }
+
+        ul.lc_images_grid{
+            padding-inline-start: 14px !important;
+        }
+    }
+    .slides-pane.lc-desktop{
+        float: left;
+        min-width: 400px;
+        max-width: 540px;
     }
     .slides-pane {
         overflow: scroll;
     }
     .map-container {
+        font-family: Knockout48;
         margin: 0;
         height: 600px;
         width: 100%;
         position: relative;
         padding-top: 25px;
     }
-    .map-container > div {
-        display: inline-block;
-    }
-    .lc-desktop {
+    .lc-slides-and-filters {
         padding-left: 10px;
-    }
-    .lc-mobile {
-        padding: 0 10px;
     }
     @media only screen and (min-width: 640px) {
         #map, .lc-desktop {
             height: 100%;
         }
-        .lc-desktop {
-            width: 25%;
-        }
-        #map {
-            width: 74%;
+        div#map:before {
+            box-shadow: 10px -2px 11px -11px rgba(0,0,0,1) inset;
+            content: "";
+            height: 100%;
+            left: 0;
+            position: absolute;
+            width: 8px;
+            z-index: 1000;
         }
     }
     .lc_hr {
@@ -107,13 +136,18 @@
     }
 
     table.lc_data {
-        font-family: Helvetica;
         line-height: normal;
         margin: 10px 0;
         margin-bottom: 40px;
     }
     table.lc_data.lc_data_details {
         margin-bottom: 10px;
+    }
+    table.lc_data.lc_data_details td {
+        cursor: inherit;
+    }
+    .lc_data_details .lc_poi_address {
+        cursor: pointer;
     }
     @media only screen and (min-width: 640px) {
         table.lc_data {
@@ -130,10 +164,13 @@
 
     img.lc_poi_icon {
         height: 30px;
+        display: none;
     }
 
     div.lc_poi_title {
-        font-size: 20px;
+        font-size: 22px;
+        letter-spacing: 1px;
+        color: #151e27;
     }
 
     td.lc_poi_details {
@@ -147,9 +184,10 @@
 
     div.lc_poi_type,
     div.lc_poi_address {
-        font-size: 12px;
-        color: grey;
-        font-weight: normal;
+        font-size: 15px;
+        color: #141E27;
+        letter-spacing: normal;
+        font-family: SuperiorText;
     }
     div.lc-drag {
         padding: 10px 0 12px 0;
@@ -172,7 +210,6 @@
     }
 
     .lc_back_to_list {
-        font-family: Knockout-48Featherweight;
         font-size: 16px;
         padding: 5px 5px;
         font-weight: 100;
@@ -186,13 +223,28 @@
         vertical-align: middle;
     }
 
-    .lc_poi_contact {
-        color: #59223c;
-        font-size: 12px;
+    .lc_poi_contact, .lc_poi_website {
+        color: #59213b;
+        font-size: 14px;
+        font-family: SuperiorText;
+    }
+
+    .lc_poi_website_img {
+        width: 24px;
+        height: 24px;
+        margin: 0 12px;
+        vertical-align: middle;
     }
 
     .lc_poi_write_up {
         padding: 10px;
+        font-size: 13px;
+        color: black;
+        border-left: 0.2em solid #59223c;
+        font-family: 'Roboto', serif;
+        line-height: 1.5em;
+        font-weight: 100;
+        margin: 10px 0 0 15px;
     }
 
     .lc_poi_photos {
@@ -227,6 +279,7 @@
         max-height: 134px;
         max-width: 38%;
         padding: 4px;
+        cursor: pointer;
     }
 
     .lc_poi_photos_primary {
@@ -253,6 +306,7 @@
         overflow: hidden;
         outline:none;
         font-size: 14px;
+        font-family: SFUIText;
     }
 
     /* end detailed view */
@@ -262,6 +316,8 @@
         display: block !important;
         padding: 15px 10px 15px 0px;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.21);
+        overflow-x: scroll;
+        white-space: nowrap;
     }
 
     .lc_filter {
@@ -270,9 +326,25 @@
         padding: 8px 10px;
         border-radius: 3px;
         margin-right: 12px;
-        font-size: 14px;
+        font-size: 18px;
         cursor: pointer;
         background-color: white;
+        letter-spacing: 0.8px;
+    }
+
+    .lc_filter_pin {
+        background-repeat: no-repeat;
+        /*padding-left: 25px !important;*/
+        background-size: 20px 28px;
+        background-position: 3% 45%;
+    }
+
+    .lc_filter.restaurant {
+        /*background-image: url(https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cc6196124a694497454eebb/1556486497277/pin.png);*/
+    }
+
+    .lc_filter.product {
+        background-image: url(https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cc7eff9ee6eb06c45420380/1556606969107/OrangePin.png);
     }
 
     .lc_filter.selected {
@@ -295,21 +367,228 @@
         padding: 10px;
     }
 
-    .lc_detailed_filter_mealType {
+    .lc_detailed_filter_cuisine {
         font-size: 20px;
     }
 
-    .lc_df_mealType_entries {
+    .lc_df_cuisine_entries {
         margin-top: 10px;
         border-collapse: collapse;
     }
 
-    .lc_df_mealType_entries td {
+    .lc_df_cuisine_entries td {
         padding: 20px;
         border: 1px solid #979797;
     }
     /* end filters */
+
+    /* begin image grid */
+    .lc_images {
+        overflow: scroll;
+    }
+
+    .lc_images_back_banner {
+        background-color: #59223c;
+        cursor: pointer;
+    }
+
+    .lc_images_back_banner_text {
+        padding: 10px 5px;
+        color: white;
+    }
+
+    .lc_images_back_banner_text::before {
+        content: "\003C ";
+        font-size: 16px;
+        padding: 0 10px 0 5px;
+    }
+
+    ul.lc_images_grid {
+        margin: 0 auto;
+        width: 100%;
+        margin-top: 10px;
+        list-style: none;
+        padding-inline-start: 20px;
+    }
+
+    ul.lc_images_grid > li {
+        width: 150px;
+        height: 150px;
+        float: left;
+        margin: 0 12px 12px 0;
+        transition: 0.5s;
+    }
+
+    .lc_images_grid img {
+        /*max-width: 100%;*/
+        max-height: 100%;
+    }
+
+    /* end image grid */
+    /* begin overlay */
+    .lc_overlay {
+        height: 100%;
+        width: 0;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        background-color: rgb(0,0,0);
+        background-color: rgba(0,0,0, 0.9);
+        overflow-x: hidden;
+        transition: 0.5s;
+
+        background-repeat: no-repeat;
+        background-size: contain;
+        background-position: center center;
+    }
+
+    .lc_overlay .lc_overlay_closebtn {
+        text-decoration: none;
+        position: absolute;
+        top: 20px;
+        right: 45px;
+        font-size: 60px;
+        padding: 8px;
+        color: #818181;
+        display: block;
+        transition: 0.3s;
+    }
+
+    @media only screen and (max-width: 640px) {
+        .lc_overlay .lc_overlay_closebtn {
+            font-size: 40px;
+            top: 15px;
+            right: 20px;
+        }
+
+        .lc_left_arrow, .lc_right_arrow {
+            opacity: 0.5 !important;
+            background-color: black !important;
+        }
+
+        .lc_left_arrow {
+            margin-left: 4px !important;
+            border-width: 10px 10px 10px 0 !important;
+        }
+
+        .lc_right_arrow {
+            margin-right: 4px !important;
+            border-width: 10px 0 10px 10px !important;
+        }
+    }
+    .lc_left_arrow {
+        border-color: transparent #ee6858;
+        border-style: solid;
+        border-width: 20px 20px 20px 0px;
+        height: 0px;
+        width: 0px;
+        position: absolute;
+        top: 50%;
+        margin-left: 20px;
+        opacity: 0.7;
+    }
+
+    .lc_right_arrow {
+        border-color: transparent #ee6858;
+        border-style: solid;
+        border-width: 20px 0px 20px 20px;
+        height: 0px;
+        width: 0px;
+        position: absolute;
+        right: 0;
+        top: 50%;
+        margin-right: 20px;
+        opacity: 0.7;
+    }
+    /* end overlay */
+
+    .lc_collapsible::after {
+        margin-left: 10px;
+        content: '\25be';
+        color: grey;
+    }
+
+    .lc_active::after {
+        margin-left: 10px;
+        content: "\25B4";
+    }
+
+    .lc_hours_open {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.25s ease-out;
+    }
+
+    .lc_hours {
+        font-weight: normal;
+        margin-left: 32px;
+        font-size: 15px;
+        color: #141E27;
+        letter-spacing: normal;
+        font-family: SuperiorText;
+    }
+
+    .lc_hours_open li {
+        list-style: none;
+        width: 240px;
+        clear: both;
+        line-height: 20px;
+    }
+
+    .lc_hours_open ul {
+        padding: 0;
+        margin: 0;
+    }
+
+    .lc_hours_open_day {
+        float: left;
+    }
+
+    .lc_hours_open_day_bold {
+        font-weight: bold;
+    }
+
+    .lc_hours_open_time {
+        float: right;
+        text-align: right;
+    }
+
+    .lc_category_filter {
+        clear: both;
+        margin: 0 10px;
+        padding: 0 10px;
+        font-size: 22px;
+        line-height: normal;
+        color: #151e27;
+    }
+
+    .lc_category_filter_list {
+        padding-inline-start: 20px;
+        margin-top: 5px;
+    }
+
+    .lc_category_filter_list li {
+        list-style: none;
+        float: left;
+        padding: 5px 14px;
+        background-color: white;
+        border-radius: 18px;
+        border: solid 2px #59223c;
+        margin: 5px 5px;
+        line-height: normal;
+        font-size: 17px;
+        cursor: pointer;
+    }
+    .lc_category_filter_list li.selected {
+        background-color: #59223c;
+        color: white;
+    }
+    .lc_category_filter_list li:last-child {
+        margin-bottom: 20px;
+    }
 </style>
+
 <div class="map-container">
     <div class="slides-pane lc-desktop"></div>
     <div id="map"></div>
@@ -322,26 +601,62 @@
 <!-- Replace the value of the key parameter with your own API key. -->
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDP7hzqoCpx62MQD1apg_rZGkQFvbOrQdY&callback=initMap" async defer></script>
 
-
 <script>
     let map;
+    let metadata;
     let isMobile = false;
     let locations = [];
     let currentFilters = [];
-    const filtersAndBaseDOM = '<div class=""><hr class="lc_hr"><div class="slides-pane-content"> <div class="lc_filters"> <div class="lc_filter" pinType="restaurant">Restaurants</div><div class="lc_filter" pinType="shared_production_facility">Products</div><div class="lc_filter" data-type="cuisine">Cuisine <div class="arrow-down"></div></div></div><div class="lc_poi_slides"></div></div></div>';
+    let markerIconBasedOnZoom = {};
+    const filtersAndBaseDOM = '<div class="lc-slides-and-filters"><hr class="lc_hr"><div class="slides-pane-content"><div class="lc_filters"><div class="lc_filter lc_filter_pin restaurant selected" pinType="restaurant">RESTAURANTS</div><div class="lc_filter" data-type="category">CATEGORY <div class="arrow-down"></div></div></div></div><div class="lc_poi_slides"></div></div></div>';
     const restaurantPinURL = 'https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cc6196124a694497454eebb/1556486497277/pin.png';
     const otherPinURL = 'https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cc7eff9ee6eb06c45420380/1556606969107/OrangePin.png';
     const poiTemplate = `<div><table class="lc_data $0"><tr> <td> <img class="lc_poi_icon" src="$pinUrl"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">$1</div><div class="lc_detail lc_poi_type">$2</div><div class="lc_detail lc_poi_address">$3</div></td></tr></table></div>`;
-    const poiDetailedTemplate = `<div> <div class="lc_back_to_list">back to list</div><table class="lc_data lc_data_details"> <tr> <td> <img class="lc_poi_icon" src="$pinUrl"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">$1</div><div class="lc_detail lc_poi_type">$2</div><div class="lc_detail lc_poi_address">$3</div></td></tr></table> <div class="lc_poi_contact"> <img class="lc_poi_phone" src="https://static.thenounproject.com/png/56382-200.png"/>$4</div><p class="lc_poi_write_up"> $5</p><div class="lc_poi_links"><a class="lc_poi_google_map" href="#">OPEN IN GOOGLE MAPS</a><a class="lc_poi_yelp" href="#">OPEN IN YELP</a></div> <div class="lc_poi_photos"> <img class="lc_poi_photos_primary" src="$6"/> <div class="lc_poi_photos_secondary_container"> <img class="lc_poi_photos_secondary" src="$7"/> <button class="lc_poi_photos_secondary_all_photos" onClick="showAllPhotos()">All photos</button></div></div></div>`;
+    const backToList = `<div class="lc_back_to_list">back to list</div>`;
+    const poiDetailedTemplate = `<div><table class="lc_data lc_data_details"> <tr> <td> <img class="lc_poi_icon" src="$pinUrl"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">$1</div><div class="lc_detail lc_poi_type">$2</div><div class="lc_detail lc_poi_address"><a href="$address_glink">$3</a></div></td></tr></table>$openhours$contact$website$writeup<div class="lc_poi_photos"> <img class="lc_poi_photos_primary" src="$6"/> <div class="lc_poi_photos_secondary_container"> <img class="lc_poi_photos_secondary" src="$7"/> <button class="lc_poi_photos_secondary_all_photos">All photos</button></div></div><div class="lc_poi_links"><a class="lc_poi_google_map" href="$gLink" target="_blank">OPEN IN GOOGLE MAPS</a> <a class="lc_poi_yelp" href="$yelplink" target="_blank">OPEN IN YELP</a></div></div>`;
+    const photoGrid = '<div class="lc_images"> <div class="lc_images_back_banner"> <div class="lc_images_back_banner_text"> $title </div></div><ul class="lc_images_grid">$imageRows</ul></div>';
+    const overlay = '<div class="lc_overlay"> <a href="#" class="lc_overlay_closebtn">&times;</a><div class="lc_left_arrow"></div><div class="lc_right_arrow"></div></div>';
+
+    const showFilters = (show = true) => {
+        if(show) {
+            $('.lc_filters').attr('style', '');
+            $('.lc_back_to_list').off('click');
+        } else {
+            $('.lc_filters').attr('style','display:none !important');
+            $('.lc_back_to_list').click(() => {
+                $('.lc_filters').attr('style', '');
+                let filteredLocations = currentFilters.length === 0 ? locations : locations.filter(location => {
+                    let show = false;
+                    currentFilters.forEach(filter => {
+                        if(location[filter.type].indexOf(filter.value) > -1) {
+                            show = true;
+                        }
+                    });
+                    return show;
+                });
+                locations.forEach(location => {
+                    location.marker.setMap(null);
+                });
+                setupMarkers(filteredLocations);
+                setupPoiSlides(filteredLocations);
+                if(filteredLocations.length > 0) {
+                    map.setCenter({
+                        lat: filteredLocations[0].coordinates.latitude,
+                        lng: filteredLocations[0].coordinates.longitude
+                    });
+                }
+            });
+        }
+
+    };
     const setupPoiSlides = (locations) => {
         $('.lc_poi_slides').html("");
         for (var location of locations) {
-            let html = poiTemplate.replace('$1', location.name);
+            let html = poiTemplate.replace('$1', location.name.toUpperCase());
             html = html.replace('$2', location.categories.map(e => e.title).join(" &#183; "));
             html = html.replace('$3', location.location.display_address.join("<br>"));
             html = html.replace('$0', location.id);
-            let pinUrl = ('restaurant' == location.pinType || 'cafe' == location.pinType) ? restaurantPinURL : otherPinURL;
-            html = html.replace('$pinUrl', pinUrl);
+            html = html.replace('$pinUrl', restaurantPinURL);
             const poiData = location;
             $('.lc_poi_slides').append(html);
             $(`.${location.id}`).click(() => {
@@ -349,27 +664,83 @@
             });
         }
     };
+    const createGoogleMapsLink = (location) => {
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([location.name, ...location.location.display_address].join(", "))}`;
+    };
     const setupPoiDetailedSlide = (poi) => {
-        let html = poiDetailedTemplate.replace('$1', poi.name);
+        const contact = `<div class="lc_poi_contact"><a href="tel:$callLink"><img class="lc_poi_phone" src="https://static.thenounproject.com/png/56382-200.png"/>$phone</a></div>`;
+        const website = `<div class="lc_poi_website"><a href="$website"><img class="lc_poi_website_img" src="https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5d0a92263de9360001f99020/1560973862432/website_icon.png" />$website</a></div>`;
+        const writeup = `<p class="lc_poi_write_up">$text</p>`;
+        const gMapLocation = createGoogleMapsLink(poi);
+        let html = backToList;
+        html += poiDetailedTemplate.replace('$1', poi.name.toUpperCase());
         html = html.replace('$2', poi.categories.map(e => e.title).join(" &#183; "));
-        html = html.replace('$3', poi.location.display_address.join("<br>"));
-        html = html.replace('$4', poi.display_phone);
-        html = html.replace('$5', poi.writeUp || "Write up goes here");
+        html = html.replace('$3', poi.location.display_address.join("<br>")).replace('$address_glink', gMapLocation);
+        html = html.replace('$openhours', poi.hours ? generateOpenHoursDOM(poi.hours[0]) : '');
+        html = html.replace('$contact', poi.display_phone ? contact.replace("$phone", poi.display_phone).replace("$callLink", poi.display_phone) : '');
+        html = html.replace('$website', poi.website ? website.replace("$website", poi.website).replace("$website", poi.website) : '');
+        html = html.replace('$writeup', poi.writeUp ? writeup.replace("$text", poi.writeUp) : '');
+        html = html.replace('$yelplink', poi.url);
+        html = html.replace('$gLink', gMapLocation);
         html = html.replace('$6', poi.photos[0]);
         html = html.replace('$7', poi.photos[1]);
-        let pinUrl = ('restaurant' == poi.pinType || 'cafe' == poi.pinType) ? restaurantPinURL : otherPinURL;
-        html = html.replace('$pinUrl', pinUrl);
+        html = html.replace('$pinUrl', restaurantPinURL);
         $('.lc_poi_slides').html(html);
-        $('.lc_filters').attr('style','display:none !important');
-        $('.lc_back_to_list').click(() => {
-            $('.lc_filters').attr('style', '');
-            setupPoiSlides(locations);
+        showFilters(false);
+        $('.lc_poi_address').click(() => {
+
+        });
+        $('.lc_poi_photos').click(() => {
+            setupPhotoGrid(poi);
+        });
+        $('.lc_hours_status').click(function() {
+            $(this).toggleClass('lc_collapsible');
+            $(this).toggleClass('lc_active');
+            if ($(this).hasClass('lc_active')) {
+                $('.lc_hours_open').css('max-height', $('.lc_hours_open').prop('scrollHeight') + 'px');
+            } else {
+                $('.lc_hours_open').css('max-height', '0');
+            }
         });
         slidePaneExpCollapse(true);
     };
+    const setupPhotoGrid = (poi) => {
+        $('.lc_hr').hide();
+        let html = photoGrid.replace('$title', poi.name.toUpperCase());
+        let rows = [];
+        (poi.allPhotos || []).forEach((imgId, index) => {
+            const src = `https://s3-media2.fl.yelpcdn.com/bphoto/${imgId}/o.jpg`;
+            const srcSet = `https://s3-media2.fl.yelpcdn.com/bphoto/${imgId}/300s.jpg 1.16x,https://s3-media2.fl.yelpcdn.com/bphoto/${imgId}/348s.jpg 1.35x`;
+            rows.push(`<li><img src="${src}" srcset="${srcSet}" lcindex=${index} height="226" width="226" /></li>`);
+        });
+        html = html.replace('$imageRows', rows.join(''));
+        $('.lc_poi_slides').html(html);
+        $('.lc_images_back_banner').click(() => {
+            setupPoiDetailedSlide(poi);
+        });
+        $('.lc_images_grid img').click(function() {
+            const img = $(this).attr('src').replace('url(','').replace(')','').replace(/\"/gi, "");
+            const imgIndex = $(this).attr('lcindex');
+            if(img) {
+                let currentIndex = parseInt(imgIndex);
+                $('.lc_overlay').css('background-image', `url(${img})`);
+                $('.lc_overlay').css('width', '100%');
+                $('.lc_left_arrow').click(function() {
+                    currentIndex = (currentIndex - 1) < 0 ? poi.allPhotos.length - 1 : currentIndex - 1;
+                    $('.lc_overlay').css('background-image', `url(https://s3-media2.fl.yelpcdn.com/bphoto/${poi.allPhotos[currentIndex]}/o.jpg)`);
+                });
+                $('.lc_right_arrow').click(function() {
+                    currentIndex = (currentIndex + 1) >= poi.allPhotos.length ? 0 : currentIndex + 1;
+                    $('.lc_overlay').css('background-image', `url(https://s3-media2.fl.yelpcdn.com/bphoto/${poi.allPhotos[currentIndex]}/o.jpg)`);
+                });
+            }
+        });
+    };
+    const getZoomBasedIcon = () => (map.getZoom() >= 1 && map.getZoom() >= 17) ? markerIconBasedOnZoom[17] : markerIconBasedOnZoom[1];
     const setupMarkers = (locations) => {
+        const zoomBasedIcon = getZoomBasedIcon();
         for (var location of locations) {
-            let pinUrl = ('restaurant' == location.pinType || 'cafe' == location.pinType) ? restaurantPinURL : otherPinURL;
+            const pinUrl = restaurantPinURL;
             let marker = new google.maps.Marker({
                 position: {
                     lat: location.coordinates.latitude,
@@ -378,7 +749,12 @@
                 map: map,
                 animation: google.maps.Animation.DROP,
                 title: location.name,
-                icon: pinUrl
+                icon: {
+                    url: pinUrl,
+                    scaledSize: zoomBasedIcon.scaledSize,
+                    origin: zoomBasedIcon.origin,
+                    anchor: zoomBasedIcon.anchor
+                }
             });
             const poiData = location;
             marker.addListener('click', () => {
@@ -388,16 +764,120 @@
         }
     };
 
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const generateOpenHoursDOM = (hours) => {
+        let hoursDOM = '<div class="lc_hours"><div class="lc_hours_status lc_collapsible">$status</div><div class="lc_hours_open">$openhours</div></div>';
+        // we do not rely on yelp data, becuase we cache it
+        if (!hours) { return };
+
+        // is open now - create 'open now - closes at x'
+        const date = new Date();
+        const today = date.getDay();
+        const currentTime = parseInt(`${date.getHours()}${date.getMinutes()}`);
+        const yelpToday = hours.open.find(e => e.day === today);
+        // all days open hours
+        let openDays = [];
+        hours.open.map(e => {
+            if (openDays.indexOf(e.day) === -1) {
+                openDays.push(e.day);
+            }
+        });
+        const openHours = openDays.map(day => {
+            const openHours = hours.open.filter(e => e.day === day);
+            hoursString = openHours.map(e => `${formatTime(e.start)} - ${formatTime(e.end)}`).join("<br>");
+            return {
+                day,
+                openHours,
+                hoursString: hoursString
+            };
+        });
+
+        let status = "Closed today";
+        if (today && yelpToday) {
+            // open today
+            let yelpTodayOpenHours = openHours.find(e => e.day === today).openHours;
+            let open = false;
+            let closestOpenTimeDiff = 999999;
+            let closestOpen = '';
+            yelpTodayOpenHours.forEach(e => {
+               if(!open) {
+                   if ((currentTime > parseInt(e.start) && currentTime < parseInt(e.end))) {
+                       open = true;
+                   } else {
+                       const diff = (parseInt(e.start) - currentTime);
+                       if (diff > 0 && diff < closestOpenTimeDiff) {
+                           closestOpenTimeDiff = diff;
+                           closestOpen = formatTime(e.start);
+                       }
+                   }
+               }
+            });
+            if (open) {
+                status = `Open now &#183; Closes at ${formatTime(yelpTodayOpenHours[yelpTodayOpenHours.length - 1].end)}`;
+            } else {
+                if(closestOpen) {
+                    status = `Closed now &#183; Opens at ${closestOpen}`;
+                } else {
+                    status = `Closed now`;
+                }
+
+            }
+        }
+        let orderedHoursBasedOnCurrentDate = [];
+        const checkAndAddData = (day) => {
+            const data = openHours.find(e => e.day === day);
+            if(data) {
+                orderedHoursBasedOnCurrentDate.push(data);
+            }
+        };
+        // current to end of week
+        for(let i = today; i < 7; i++) {
+            checkAndAddData(i);
+        }
+        // start to current
+        if (today > 0) {
+            for(let i = 0; i < today; i++) {
+                checkAndAddData(i);
+            }
+        }
+
+
+        const openHoursDom = orderedHoursBasedOnCurrentDate.map(e => {
+           return `<li><span class="lc_hours_open_day ${e.day === today ? "lc_hours_open_day_bold" : ""}">${days[e.day]}</span><span class="lc_hours_open_time ${e.day === today ? "lc_hours_open_day_bold" : ""}">${e.hoursString}</span></li>`;
+        });
+
+        hoursDOM = hoursDOM.replace('$status', status);
+        hoursDOM = hoursDOM.replace('$openhours', `<ul>${openHoursDom.join("")}</ul>`);
+
+        return hoursDOM;
+    };
+
     function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 13,
+            zoom: 14,
             center: {
-                lat: 37.76,
-                lng: -122.445
+                lat: 37.7785993,
+                lng: -122.3914585
             },
             streetViewControl: false,
             mapTypeControl: false,
-            gestureHandling: 'greedy'
+            gestureHandling: 'cooperative',
+            fullscreenControl: false,
+            zoomControl: true
+        });
+
+        map.setOptions({
+            styles: [
+                {
+                    featureType: 'poi.business',
+                    stylers: [{visibility: 'off'}]
+                },
+                {
+                    featureType: 'transit',
+                    elementType: 'labels.icon',
+                    stylers: [{visibility: 'off'}]
+                }
+            ]
         });
     }
 
@@ -411,48 +891,143 @@
         }
     }
 
-    $(function() {
-        $.ajax({
-            url: "https://lacocinacache.herokuapp.com/all"
-        }).done(data => {
-            locations = data;
+    function oneTimeSetup() {
+        markerIconBasedOnZoom = {
+            1: {
+                scaledSize: new google.maps.Size(17, 22), // scaled size
+                origin: new google.maps.Point(0,0), // origin
+                anchor: new google.maps.Point(0, 0) // anchor
+            },
+            17: {}
+        };
+        const $desktop = $('.lc-desktop');
+        const $mobile = $('.lc-mobile');
+        if (screen.width > 640) {
+            $mobile.remove();
+            $desktop.append($(filtersAndBaseDOM));
+        } else {
+            isMobile = true;
+            $desktop.remove();
+            $mobile.append($(filtersAndBaseDOM));
+        }
+    }
 
-            const $desktop = $('.lc-desktop');
-            const $mobile = $('.lc-mobile');
-            if (screen.width > 640) {
-                $mobile.remove();
-                $desktop.append($(filtersAndBaseDOM));
-            } else {
-                isMobile = true;
-                $desktop.remove();
-                $mobile.append($(filtersAndBaseDOM));
+    function setupOverlay() {
+        $('body').append($(overlay));
+        $('.lc_overlay_closebtn').click(() => {
+            $('.lc_overlay').css('width', '0%');
+            $('.lc_overlay_content').html('');
+        });
+    }
+
+    function formatTime(t) {
+        let hrs = parseInt(t.substring(0, 2));
+        const mins = t.substring(2);
+        const noon = hrs > 11 ? 'PM' : 'AM';
+        hrs = hrs > 12 ? hrs - 12 : hrs;
+        // mid night use case
+        if(hrs === 0 && mins === '00') {
+            return 'midnight'
+        }
+        hrs = hrs === 0 ? 12 : hrs;
+        return `${hrs}${mins !== '00' ? `:${mins}` : ''} ${noon}`;
+    }
+
+    function setupZoomListener(locations) {
+        map.addListener('zoom_changed', function() {
+            const zoomBasedIcon = getZoomBasedIcon();
+            for (var location of locations) {
+                location.marker.setIcon({
+                    url: location.marker.getIcon().url,
+                    scaledSize: zoomBasedIcon.scaledSize,
+                    origin: zoomBasedIcon.origin,
+                    anchor: zoomBasedIcon.anchor
+                });
+            }
+        });
+    }
+    const formatFilterValue = value => value.toLowerCase().trim().split(" ").join("_");
+
+    const createCategoryFilters = () => {
+        let html = backToList;
+        let localSelections = currentFilters.map(e => {
+            return {
+                type: e.type,
+                value: e.value
+            };
+        });
+        let filters = {
+            mealTypes: 'MEAL TYPE',
+            cuisines: 'CUISINE',
+            businessTypes: 'BUSINESS TYPE'
+        };
+
+        Object.keys(filters).forEach(type => {
+            let options = metadata[type];
+            if(options === undefined || options.length === 0) {
+                return;
             }
 
-            setupMarkers(data);
-            setupPoiSlides(data);
+            let title = `<div class="lc_category_filter">${filters[type]}</div>`;
+            var optionsHtml = ``;
+            options.forEach(option => {
+                const isSelected = currentFilters.filter(filter => filter.type === type && filter.value === formatFilterValue(option)).length > 0;
+                optionsHtml += `<li class="${isSelected ? 'selected' : ''}" data-filter-type="${type}" data-filter-value="${option}">${option.toUpperCase()}</li>`;
+            });
+            optionsHtml = `<ul class="lc_category_filter_list">${optionsHtml}</ul>`;
+            html+=`${title}${optionsHtml}`
+        });
+        // buttons
+        // let buttonsHtml = `<div class="lc_category_filter_button lc_cancel">Cancel</div><div class="lc_category_filter_button lc_save">Save</div>`;
+        // html+=buttonsHtml;
+
+        $('.lc_poi_slides').html(html);
+        $('.lc_category_filter_list li').click(function() {
+            const filterType = $(this).attr("data-filter-type");
+            const filterValue = formatFilterValue($(this).attr("data-filter-value"));
+
+            let indexOfFilter = localSelections.findIndex(filter => filter.type === filterType && filter.value === filterValue);
+            if(indexOfFilter >= 0) {
+                $(this).removeClass("selected");
+                localSelections.splice(indexOfFilter, 1);
+            } else {
+                $(this).addClass("selected");
+                localSelections.push({
+                    type: filterType,
+                    value: filterValue
+                });
+            }
+
+            currentFilters = localSelections;
+        });
+
+        showFilters(false);
+    };
+
+    $(function() {
+        $.ajax({
+            url: `https://lacocinacache.herokuapp.com/all?r=${Math.random()}`,
+            timeout: 12500,
+            retryLimit: 3
+        }).done(data => {
+            metadata = data.filter(e => e.id === 'meta')[0];
+            locations = data.filter(e => e !== undefined && !e.error && e.id !== 'meta' && e.is_closed === false);
+
+            oneTimeSetup();
+            setupMarkers(locations);
+            setupZoomListener(locations);
+            setupPoiSlides(locations);
+            setupOverlay();
 
             $('.lc_filter').click(function() {
-                const interactedPinType = $(this).attr('pintype');
-                const pinIndex = currentFilters.indexOf(interactedPinType);
-                if (pinIndex > -1) {
-                    currentFilters.splice(pinIndex, 1);
-                    $(this).removeClass('selected');
-                } else {
-                    currentFilters.push(interactedPinType);
-                    $(this).addClass('selected');
+                const filterType = $(this).attr("data-type");
+                switch (filterType) {
+                    case 'category':
+                        createCategoryFilters();
+                        return;
+                    default:
+                        return;
                 }
-                setupPoiSlides(locations.filter(location => {
-                    if(currentFilters.length == 0) {
-                        location.marker.setMap(map);
-                        return true;
-                    } else if(currentFilters.indexOf(location.pinType) > -1) {
-                        location.marker.setMap(map);
-                        return true;
-                    } else {
-                        location.marker.setMap(null);
-                        return false;
-                    }
-                }));
             });
         });
 

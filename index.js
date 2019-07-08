@@ -3,6 +3,7 @@
 const express = require('express');
 const app = express();
 const yelpClient = require('./yelpClient');
+const yelpCrawler = require('./yelpImageCrawler');
 const gSheetClient = require('./gSheet-client');
 
 app.set('port', (process.env.PORT || 8080));
@@ -16,18 +17,35 @@ app.use((req, res, next) => {
     next();
 });
 
-app.get('/', async (req, res) => {
+// heroku sleeps app if no traffic - so we ping from http://kaffeine.herokuapp.com/ every 30 mins
+app.get('/', (req, res) => {
+    res.send({
+        success: 1
+    });
+});
+
+app.get('/with', async (req, res) => {
     const data = await (yelpClient.getDataFor(req.query.id));
     res.send(data);
 });
 
+app.get('/photos', async (req, res) => {
+    res.send(yelpCrawler.getPhotos(req.query.id) || []);
+});
+
 app.get('/all', async (req, res) => {
     const places = await (gSheetClient.getSheetData());
-    const data = await Promise.all(places.map(place => {
+    const data = await Promise.all(places.map(placeSheetData => {
         return new Promise(async (resolve) => {
-            const details = await (yelpClient.getDataFor(place.id));
-            details.pinType = place.pinType;
-            resolve(details)
+            if (placeSheetData.id === 'meta') {
+                resolve(placeSheetData);
+            }
+            let details = await (yelpClient.getDataFor(placeSheetData.id));
+            if(details) {
+                details = Object.assign({}, details, placeSheetData);
+                details.allPhotos = yelpCrawler.getPhotos(placeSheetData.id) || [];
+            }
+            resolve(details);
         });
     })).catch(error => {
         console.log(error.message);
@@ -36,16 +54,25 @@ app.get('/all', async (req, res) => {
 });
 
 app.listen(app.get('port'), () => {
+    const refreshHoursInMS = (yelpClient.cacheOutDateTimeInHours * 60 * 60 * 1000) + 2000;
     console.log("Node app is running at localhost:" + app.get('port'));
     warmUpCache();
+    setInterval(() => {
+        warmUpCache();
+    },  refreshHoursInMS);
 });
 
 const warmUpCache = async () => {
     console.log("Warming up - yelp data");
     const places = await (gSheetClient.getSheetData());
+    // -1 for meta data
+    console.log(`Got ${places.length - 1} to warm up`);
     for (const place of places) {
+        if (place.id === 'meta') {
+            continue;
+        }
         try {
-            const data = await yelpClient.getDataFor(place.id);
+            const data = await yelpClient.getDataFor(place.id, true);
             if(!data.id) {
                 console.error(`Error fetching ${place.id}`);
             }
@@ -53,5 +80,12 @@ const warmUpCache = async () => {
             console.log(`Exception while fetching ${place.id}`, e)
         }
     };
-    console.log(`warmed up - ${places.length}`);
+    console.log(`warmed up - ${places.length - 1}`);
+    // trigger photo crawl
+    places.forEach(place => {
+        if (place.id === 'meta') {
+            return;
+        }
+        yelpCrawler.crawl(place.id);
+    });
 };
