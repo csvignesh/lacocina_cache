@@ -696,7 +696,7 @@
     };
     const setupPoiDetailedSlide = (poi) => {
         const contact = `<div class="lc_poi_contact"><a href="tel:$callLink"><img class="lc_poi_phone" src="https://static.thenounproject.com/png/56382-200.png"/>$phone</a></div>`;
-        const website = `<div class="lc_poi_website"><a href="$website"><img class="lc_poi_website_img" src="https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5d0a92263de9360001f99020/1560973862432/website_icon.png" />$website</a></div>`;
+        const website = `<div class="lc_poi_website"><a href="$website" target="_blank"><img class="lc_poi_website_img" src="https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5d0a92263de9360001f99020/1560973862432/website_icon.png" />$website</a></div>`;
         const writeup = `<p class="lc_poi_write_up">$text</p>`;
         const gMapLocation = createGoogleMapsLink(poi);
         let html = backToList;
