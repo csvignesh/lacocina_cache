@@ -35,13 +35,23 @@ module.exports = {
                     id: 'meta',
                     businessTypes: new Set([]),
                     mealTypes: new Set([]),
-                    cuisines: new Set([])
+                    cuisines: new Set([]),
+                    displayMap: {}
                 };
                 let data = response.data.values.map(e => {
                     // add data to meta for filters to be available on client
-                    parseMultiDataWithActualText(e[1]).forEach(e => meta.businessTypes.add(e));
-                    parseMultiDataWithActualText(e[2]).forEach(e => meta.mealTypes.add(e));
-                    parseMultiDataWithActualText(e[3]).forEach(e => meta.cuisines.add(e));
+                    parseMultiDataWithActualText(e[1]).forEach(e => {
+                        meta.businessTypes.add(e);
+                        meta.displayMap[parseMultiData(e)] = e;
+                    });
+                    parseMultiDataWithActualText(e[2]).forEach(e => {
+                        meta.mealTypes.add(e);
+                        meta.displayMap[parseMultiData(e)] = e;
+                    });
+                    parseMultiDataWithActualText(e[3]).forEach(e => {
+                        meta.cuisines.add(e);
+                        meta.displayMap[parseMultiData(e)] = e;
+                    });
 
                     return {
                         id: e[0],

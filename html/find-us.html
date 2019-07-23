@@ -231,10 +231,10 @@
     }
 
     .lc_poi_write_up {
-        /*padding: 10px;*/
+        padding: 10px;
         font-size: 15px;
         color: black;
-        /*border-left: 0.2em solid #59223c; */
+        border-left: 0.2em solid #59223c;
         font-family: SuperiorText;
         line-height: 1.5em;
         font-weight: 100;
@@ -690,6 +690,14 @@
     const createGoogleMapsLink = (location) => {
         return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([location.name, ...location.location.display_address].join(", "))}`;
     };
+    const buildCategoryString = (poi) => {
+        let poiCategory = [];
+        poiCategory.push(poi.cuisines.map(e => metadata.displayMap[e]).join(", "));
+        poiCategory.push(poi.mealTypes.map(e => metadata.displayMap[e]).join(", "));
+        poiCategory.push(poi.businessTypes.map(e => metadata.displayMap[e]).join(", "));
+        return poiCategory.join(" &#183; ");
+    };
+
     const setupPoiDetailedSlide = (poi) => {
         const contact = `<div class="lc_poi_contact"><a href="tel:$callLink"><img class="lc_poi_phone" src="https://static.thenounproject.com/png/56382-200.png"/>$phone</a></div>`;
         const website = `<div class="lc_poi_website"><a href="$website" target="_blank"><img class="lc_poi_website_img" src="https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5d0a92263de9360001f99020/1560973862432/website_icon.png" />$website</a></div>`;
@@ -697,7 +705,7 @@
         const gMapLocation = createGoogleMapsLink(poi);
         let html = backToList;
         html += poiDetailedTemplate.replace('$1', poi.name.toUpperCase());
-        html = html.replace('$2', poi.categories.map(e => e.title).join(" &#183; "));
+        html = html.replace('$2', buildCategoryString(poi));
         html = html.replace('$3', poi.location.display_address.join("<br>")).replace('$address_glink', gMapLocation);
         html = html.replace('$openhours', poi.hours ? generateOpenHoursDOM(poi.hours[0]) : '');
         html = html.replace('$contact', poi.display_phone ? contact.replace("$phone", poi.display_phone).replace("$callLink", poi.display_phone) : '');
@@ -1038,6 +1046,14 @@
         }).done(data => {
             metadata = data.filter(e => e.id === 'meta')[0];
             locations = data.filter(e => e !== undefined && !e.error && e.id !== 'meta' && e.is_closed === false);
+            // sort data in alphabetical order
+            locations = locations.sort((location1, location2) => {
+                const a = location1.name.toLowerCase().replace(/\W/g, '');
+                const b = location2.name.toLowerCase().replace(/\W/g, '');
+                if(a < b) { return -1; }
+                if(a > b) { return 1; }
+                return 0;
+            });
 
             oneTimeSetup();
             setupMarkers(locations);
