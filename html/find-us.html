@@ -58,6 +58,47 @@
             padding-inline-start: 14px !important;
         }
     }
+
+    @media only screen and (max-width: 640px) {
+        .slides-pane {
+            height: 300px;
+        }
+    }
+
+    @media only screen and (max-width: 640px) {
+        .Site {
+            border: none !important;
+        }
+    }
+
+    @media only screen and (min-width: 640px) {
+        #map, .lc-desktop {
+            height: 100%;
+        }
+        div#map:before {
+            box-shadow: 10px -2px 11px -11px rgba(0,0,0,1) inset;
+            content: "";
+            height: 100%;
+            left: 0;
+            position: absolute;
+            width: 8px;
+            z-index: 1000;
+        }
+    }
+
+    @media only screen and (min-width: 640px) {
+        table.lc_data {
+            min-height: 120px;
+            min-width: 300px;
+        }
+    }
+
+    @media only screen and (max-width: 640px) {
+        a.lc_poi_google_map a.lc_poi_yelp {
+            width: auto;
+        }
+    }
+
     .slides-pane.lc-desktop{
         float: left;
         min-width: 400px;
@@ -78,29 +119,12 @@
     .lc-slides-and-filters {
         overflow-x: hidden;
     }
-    @media only screen and (min-width: 640px) {
-        #map, .lc-desktop {
-            height: 100%;
-        }
-        div#map:before {
-            box-shadow: 10px -2px 11px -11px rgba(0,0,0,1) inset;
-            content: "";
-            height: 100%;
-            left: 0;
-            position: absolute;
-            width: 8px;
-            z-index: 1000;
-        }
-    }
+
     .slides-pane {
         background-color: #f5f4ef;
         bottom: 0;
     }
-    @media only screen and (max-width: 640px) {
-        .slides-pane {
-            height: 300px;
-        }
-    }
+    
     .slides-pane-content {
         overflow-y: scroll;
         overflow-x: hidden;
@@ -111,11 +135,7 @@
         width: 100% !important;
         padding: 0 !important;
     }
-    @media only screen and (max-width: 640px) {
-        .Site {
-            border: none !important;
-        }
-    }
+    
     section[data-content-field="main-content"] {
         padding: 0px 17px !important;
     }
@@ -127,7 +147,7 @@
     table.lc_data {
         line-height: normal;
         margin: 10px 0;
-        margin-bottom: 40px;
+        margin-bottom: 20px;
     }
     table.lc_data.lc_data_details {
         margin-bottom: 10px;
@@ -138,13 +158,6 @@
     .lc_data_details .lc_poi_address {
         cursor: pointer;
     }
-    @media only screen and (min-width: 640px) {
-        table.lc_data {
-            min-height: 120px;
-            min-width: 300px;
-            margin-bottom: 5px;
-        }
-    }
 
     table.lc_data td {
         vertical-align: top;
@@ -152,7 +165,7 @@
     }
 
     hr.lc_data_line {
-        border-width: 0.5px;
+        border-width: 0.05em;
         background-color:#99999;
     }
 
@@ -259,12 +272,6 @@
         border-radius: 3px;
         -moz-border-radius: 3px;
         -webkit-border-radius: 3px;
-    }
-
-    @media only screen and (max-width: 640px) {
-        a.lc_poi_google_map a.lc_poi_yelp {
-            width: auto;
-        }
     }
 
     .lc_poi_photos_primary,
