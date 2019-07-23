@@ -676,7 +676,7 @@
         $('.lc_poi_slides').html("");
         for (var location of locations) {
             let html = poiTemplate.replace('$1', location.name.toUpperCase());
-            html = html.replace('$2', location.categories.map(e => e.title).join(" &#183; "));
+            html = html.replace('$2', buildCategoryString(location));
             html = html.replace('$3', location.location.display_address.join("<br>"));
             html = html.replace('$0', location.id);
             html = html.replace('$pinUrl', restaurantPinURL);
@@ -693,7 +693,7 @@
     const buildCategoryString = (poi) => {
         let poiCategory = [];
         poiCategory.push(poi.cuisines.map(e => metadata.displayMap[e]).join(", "));
-        poiCategory.push(poi.mealTypes.map(e => metadata.displayMap[e]).join(", "));
+        poiCategory.push(poi.mealTypes.map(e => metadata.displayMap[e]).join(" & "));
         poiCategory.push(poi.businessTypes.map(e => metadata.displayMap[e]).join(", "));
         return poiCategory.join(" &#183; ");
     };
