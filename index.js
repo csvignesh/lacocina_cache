@@ -17,23 +17,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// heroku sleeps app if no traffic - so we ping from http://kaffeine.herokuapp.com/ every 30 mins
-app.get('/', (req, res) => {
-    res.send({
-        success: 1
-    });
-});
-
-app.get('/with', async (req, res) => {
-    const data = await (yelpClient.getDataFor(req.query.id));
-    res.send(data);
-});
-
-app.get('/photos', async (req, res) => {
-    res.send(yelpCrawler.getPhotos(req.query.id) || []);
-});
-
-app.get('/all', async (req, res) => {
+const getAll = async (req, res) => {
     const places = await (gSheetClient.getSheetData());
     const data = await Promise.all(places.map(placeSheetData => {
         return new Promise(async (resolve) => {
@@ -51,7 +35,23 @@ app.get('/all', async (req, res) => {
         console.log(error.message);
     });
     res.send(data);
+};
+
+// heroku sleeps app if no traffic - so we ping from http://kaffeine.herokuapp.com/ every 30 mins
+app.get('/', (req, res) => {
+    getAll(req, res);
 });
+
+app.get('/with', async (req, res) => {
+    const data = await (yelpClient.getDataFor(req.query.id));
+    res.send(data);
+});
+
+app.get('/photos', async (req, res) => {
+    res.send(yelpCrawler.getPhotos(req.query.id) || []);
+});
+
+app.get('/all', getAll);
 
 app.listen(app.get('port'), () => {
     const refreshHoursInMS = (yelpClient.cacheOutDateTimeInHours * 60 * 60 * 1000) + 2000;
