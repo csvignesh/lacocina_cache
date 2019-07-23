@@ -636,11 +636,12 @@
             $('.lc_back_to_list').off('click');
         } else {
             $('.lc_filters').attr('style','display:none !important');
-            $('.lc_back_to_list, .lc_filter_done, .lc_filter_cancel').click(() => {
+            $('.lc_back_to_list, .lc_filter_done, .lc_filter_cancel').click((e) => {
+                const isCancel = $(e.target).hasClass('lc_filter_cancel');
                 $('.lc_filters').attr('style', '');
                 let filteredLocations = locations;
 
-                if (currentFilters.length > 0) {
+                if (!isCancel && currentFilters.length > 0) {
                     Object.keys(filterTypes).forEach((filterType) => {
                         const filtersForCurrentType = currentFilters.filter(e => e.type === filterType);
                         if (filtersForCurrentType.length === 0) { return; }
@@ -664,12 +665,6 @@
                     });
                     setupMarkers(filteredLocations);
                     setupPoiSlides(filteredLocations);
-                    if (filteredLocations.length > 0) {
-                        // map.setCenter({
-                        //     lat: filteredLocations[0].coordinates.latitude,
-                        //     lng: filteredLocations[0].coordinates.longitude
-                        // });
-                    }
                 } else {
                     setupPoiSlides(filteredLocations);
                 }
