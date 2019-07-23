@@ -629,6 +629,10 @@
         cuisines: 'CUISINE',
         businessTypes: 'BUSINESS TYPE'
     };
+    const mapCenter = {
+        lat: 37.7785993,
+        lng: -122.3914585
+    };
 
     const showFilters = (show = true, refreshCenterIfNeeded = false) => {
         if(show) {
@@ -667,6 +671,10 @@
                     setupPoiSlides(filteredLocations);
                 } else {
                     setupPoiSlides(filteredLocations);
+                }
+
+                if (isCancel) {
+                    map.setCenter(new google.maps.LatLng(mapCenter.lat, mapCenter.lng));
                 }
             });
         }
@@ -885,10 +893,7 @@
     function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
             zoom: 14,
-            center: {
-                lat: 37.7785993,
-                lng: -122.3914585
-            },
+            center: mapCenter,
             streetViewControl: false,
             mapTypeControl: false,
             gestureHandling: 'cooperative',
