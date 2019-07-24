@@ -593,6 +593,13 @@
         font-size: 18px !important;
         padding: 0px 10px !important;
     }
+    .lc_filter_counter {
+        background-color: #59223c;
+        padding: 2px 7px;
+        color: white;
+        margin-right: 5px;
+        display: none;
+    }
 </style>
 
 <div class="map-container">
@@ -614,7 +621,7 @@
     let locations = [];
     let currentFilters = [];
     let markerIconBasedOnZoom = {};
-    const filtersAndBaseDOM = '<div class="lc-slides-and-filters"><div class="slides-pane-content"><div class="lc_filters"><div class="lc_filter lc_filter_pin restaurant selected" pinType="restaurant">RESTAURANTS</div><div class="lc_filter" data-type="category">CATEGORY <div class="arrow-down"></div></div></div></div><div class="lc_poi_slides"></div></div></div>';
+    const filtersAndBaseDOM = '<div class="lc-slides-and-filters"><div class="slides-pane-content"><div class="lc_filters"><div class="lc_filter lc_filter_pin restaurant selected" pinType="restaurant">RESTAURANTS</div><div class="lc_filter" data-type="category"><span class="lc_filter_counter"></span> CATEGORY <div class="arrow-down"></div></div></div></div><div class="lc_poi_slides"></div></div></div>';
     const restaurantPinURL = 'https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cc6196124a694497454eebb/1556486497277/pin.png';
     const otherPinURL = 'https://static1.squarespace.com/static/5a0a105da803bb1549f43b85/t/5cc7eff9ee6eb06c45420380/1556606969107/OrangePin.png';
     const poiTemplate = `<div><table class="lc_data $0"><tr> <td> <img class="lc_poi_icon" src="$pinUrl"/> </td><td class="lc_poi_details"> <div class="lc_poi_title">$1</div><div class="lc_detail lc_poi_type">$2</div><div class="lc_detail lc_poi_address">$3</div></td></tr></table><hr class="lc_data_line"/></div>`;
@@ -645,6 +652,8 @@
                 let filteredLocations = locations;
 
                 if (!isCancel && currentFilters.length > 0) {
+                    $('.lc_filter_counter').html(currentFilters.length);
+                    $('.lc_filter_counter').show();
                     Object.keys(filterTypes).forEach((filterType) => {
                         const filtersForCurrentType = currentFilters.filter(e => e.type === filterType);
                         if (filtersForCurrentType.length === 0) { return; }
@@ -674,6 +683,7 @@
 
                 if (isCancel) {
                     map.setCenter(new google.maps.LatLng(mapCenter.lat, mapCenter.lng));
+                    $('.lc_filter_counter').hide();
                 }
             });
         }
@@ -692,6 +702,9 @@
             $(`.${location.id}`).click(() => {
                 setupPoiDetailedSlide(poiData);
             });
+        }
+        if (locations.length === 0 && currentFilters.length > 0) {
+            $('.lc_poi_slides').append("No match found!");
         }
     };
     const createGoogleMapsLink = (location) => {
