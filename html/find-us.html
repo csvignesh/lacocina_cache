@@ -640,6 +640,15 @@
         lng: -122.3914585
     };
 
+    const changeMapBoundary = (locations) => {
+        var bounds = new google.maps.LatLngBounds();
+        for (var location of locations) {
+            bounds.extend(location.marker.getPosition());
+        }
+
+        map.fitBounds(bounds);
+    };
+
     const showFilters = (show = true, refreshCenterIfNeeded = false) => {
         if(show) {
             $('.lc_filters').attr('style', '');
@@ -679,6 +688,11 @@
                     setupPoiSlides(filteredLocations);
                 } else {
                     setupPoiSlides(filteredLocations);
+                }
+
+                // pan to accomadate all pins
+                if (currentFilters.length > 0 && filteredLocations.length > 0) {
+                    changeMapBoundary(filteredLocations);
                 }
 
                 if (isCancel) {
