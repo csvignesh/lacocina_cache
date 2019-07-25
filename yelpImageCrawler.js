@@ -8,6 +8,7 @@ const request = require('request');
 const util = require('util');
 const cheerio = require('cheerio');
 const photosCache = {};
+const yelpBackup = require('./yelp_image_back_up.json');
 
 module.exports = {
     crawl: async (id) => {
@@ -41,7 +42,6 @@ module.exports = {
                    const data = await (util.promisify(request.get)({
                        url: url
                    }));
-                   console.log(data.statusCode, data.statusMessage);
                    const $ = cheerio.load(data.body);
                    const images = $('li[data-photo-id]').map((i, el) => {
                        return el.attribs['data-photo-id'];
@@ -57,8 +57,8 @@ module.exports = {
                     allImages = allImages.concat(...arr);
                 });
 
-                photosCache[id] = allImages;
-                console.log(`Photo cahce count ${Object.keys(photosCache).length} - count ${allImages.length}`);
+                photosCache[id] = (allImages.length < -1 ? allImages : yelpBackup.find(e => e.id === id).allPhotos) || [];
+                console.log(`Photo cahce count ${Object.keys(photosCache).length}`);
             });
         }
     },
