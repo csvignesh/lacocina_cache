@@ -58,7 +58,7 @@ module.exports = {
                 });
 
                 photosCache[id] = allImages;
-                console.log(`Photo cahce count ${Object.keys(photosCache).length}`);
+                console.log(`Photo cahce count ${Object.keys(photosCache).length} - count ${allImages.length}`);
             });
         }
     },
