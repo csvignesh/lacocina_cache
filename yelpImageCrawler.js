@@ -41,7 +41,7 @@ module.exports = {
                    const data = await (util.promisify(request.get)({
                        url: url
                    }));
-
+                   console.log(data.statusCode, data.statusMessage);
                    const $ = cheerio.load(data.body);
                    const images = $('li[data-photo-id]').map((i, el) => {
                        return el.attribs['data-photo-id'];
