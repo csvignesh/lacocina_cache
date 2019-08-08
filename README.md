@@ -5,7 +5,7 @@ This repo consists of 5 modules.
 * Yelp client
 * Yelp image crawler
 * Aggregator
-* [find-us page](/find-us.html)
+* [find-us page](/html/find-us.html)
 
 ![Lacocina Cache Architecture](/lacocina_arch.png)
 
@@ -43,3 +43,5 @@ The Javascript which loads with the page, will hit the Aggregator for data, and 
 
 It is stored in this repo, so that we have version control over the html/js/css changes. Square space does not let us do this.
 So any change to the embedded html/js/css, will be made here and then updated(copy, pasted) into the square space find-us page.
+
+Code - [find-us page](/html/find-us.html)

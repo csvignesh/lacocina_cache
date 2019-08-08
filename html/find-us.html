@@ -835,7 +835,7 @@
         // is open now - create 'open now - closes at x'
         const date = new Date();
         const today = date.getDay();
-        const currentTime = parseInt(`${date.getHours()}${date.getMinutes()}`);
+        const currentTime = parseInt(`${date.getHours()}${((date.getMinutes() - 10) < 10 ? '0' : '') + date.getMinutes()}`);
         const yelpToday = hours.open.find(e => e.day === today);
         // all days open hours
         let openDays = [];
